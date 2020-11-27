@@ -1,0 +1,9 @@
+.SignIn {
+    margin: auto;
+    width: 90%;
+    margin-top: 100px;
+}
+
+.SignIn .section-title h2 {
+    margin-bottom: 20px;
+}
