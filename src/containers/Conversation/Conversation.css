@@ -1,0 +1,20 @@
+.Conversation {
+    margin: auto;
+    width: 90%;
+    margin-top: 100px;
+    height: 100%;
+}
+
+
+.Conversation .section-title h2 {
+    margin-bottom: 20px;
+}
+
+.Conversation ul > li {
+    list-style: none;
+    margin-bottom: 10px;
+}
+
+.Conversation ul > li > .name {
+    font-weight: bold;
+}

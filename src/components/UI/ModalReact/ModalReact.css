@@ -1,7 +1,11 @@
 
 
 .ModalReact {
-    position: fixed;
+    z-index: 400;
+    position:fixed;
+    display: flex;
+    justify-content: center;
+    align-items: center;
     top: 0;
     left: 0;
     width:100%;
@@ -9,20 +13,17 @@
     background: rgba(0, 0, 0, 0.6);
   }
 
-  .ModalReact main {
-    position:fixed;
+  .ModalReact .main {
     background: white;
-    width: 50%;
-    height: auto;
-    top:50%;
-    left:50%;
-    transform: translate(-50%,-50%);
+    max-width: 600px;
+    padding: 20px;
+
   }
   
-  .display-block {
+  /* .display-block {
     display: block;
   }
-  
+   */
   .display-none {
     display: none;
   }

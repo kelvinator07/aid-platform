@@ -13,7 +13,7 @@ const SelectInput = props => {
             <select className={formControl} {...props}>
                 {props.options.map((option, key) => {
                     return (
-                        <option value={option.toLowerCase()} key={key}>{option}</option>
+                        <option value={option.toLowerCase().replace(" ","_")} key={key}>{option}</option>
                     )
                 })}
             </select>

@@ -42,15 +42,15 @@ const SideBar = (props) => {
                     </div>
                 </div>
 
-                <nav className="nav-menu d-flex flex-column mt-3">
+                {props.currentUser ? <nav className="nav-menu d-flex flex-column mt-3">
                     <ul>
-                        <NavLink to="/home"><li className="active"><FontAwesomeIcon icon={faHome} /> <span>Volunteer To Help</span></li>
+                        <NavLink to="/home"><li><FontAwesomeIcon icon={faHome} /> <span>Volunteer To Help</span></li>
                         </NavLink>
                         <NavLink to="/request"><li><FontAwesomeIcon icon={faUserCheck} /> <span>Ask For Help</span></li>
                         </NavLink>
                     </ul>
                      {/* < NavigationItems /> */}
-                </nav>
+                </nav> : null}
 
                 </div>
             </header>

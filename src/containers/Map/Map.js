@@ -1,6 +1,8 @@
 import 'leaflet/dist/leaflet.css'
 import './Map.css'
 import markerIcon from 'leaflet/dist/images/marker-icon.png'
+import markerIconRed from '../../assets/images/pin.png'
+
 import markerShadow from 'leaflet/dist/images/marker-shadow.png'
 import { MapContainer, TileLayer, Popup, Marker } from 'react-leaflet'
 import L from 'leaflet'
@@ -14,7 +16,7 @@ const blueIcon = L.icon({
 })
 
 const redIcon = L.icon({
-    iconUrl: markerIcon,
+    iconUrl: markerIconRed,
     iconAnchor: [22, 94],
     popupAnchor: [-3, -76],
     shadowSize: [68, 95],
@@ -29,25 +31,21 @@ const handleClick = (value) => {
 
   
 const Map = (props) => {
- 
+  console.log("Props check ", props.requests);
+  // [51.505, -0.09]
   return (
-    <MapContainer center={[51.505, -0.09]} zoom={13} scrollWheelZoom={false}  style={{ height: '500px' }}>
+    <MapContainer center={[6.557, 3.349]} zoom={13} scrollWheelZoom={false} style={{ height: '500px' }}>
       <TileLayer
         attribution='&copy; <a href="http://osm.org/copyright">OpenStreetMap</a> contributors'
-        url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
-      />
-            {props.places.map((value, key) => {
+        url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png" />
+            {props.requests.map((value, key) => {
                 return (
-                      <Marker position={value} icon={redIcon} key={key} eventHandlers={{
-                              click: () => {
-                                props.clicked(value)
-                              },
-                            }} >
-                          <Popup>
-                          A pretty CSS3 popup. <br /> Easily customizable.
-                          </Popup>
-                      </Marker>
-                    
+                    <Marker position={value.latlng} icon={value.request_type == "one_time" ? redIcon : blueIcon} key={key} eventHandlers={{
+                            click: () => {
+                              props.clicked(value)
+                            },
+                          }} >
+                    </Marker>
                 )
             })}
     </MapContainer>

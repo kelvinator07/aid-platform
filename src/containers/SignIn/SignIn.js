@@ -3,7 +3,7 @@ import './SignIn.css';
 import TextInput from '../../components/UI/TextInput/TextInput';
 import EmailInput from '../../components/UI/EmailInput/EmailInput';
 import validate from '../Util/validate';
-import setTokenToLocalStorage from '../Util/auth';
+import { setTokenToLocalStorage, removeTokenFromLocalStorage, saveUserToLocalStorage } from '../Util/auth';
 
 import Loader from '../../components/UI/Loader/Loader';
 
@@ -25,7 +25,6 @@ class SignIn extends Component {
 
     initialFormState() {
         return {
-            
             email: {
                 value: '',
                 valid: false,
@@ -80,6 +79,7 @@ class SignIn extends Component {
     }
 
     onSubmitForm = (event) => {
+        removeTokenFromLocalStorage();
         this.setState({ isLoading: true })
         event.preventDefault();
         const formData = {};
@@ -95,7 +95,7 @@ class SignIn extends Component {
         const url = "http://localhost:5000/api/v1/login"
         
         fetch(url, {
-            method: 'POST', // or 'PUT'
+            method: 'POST',
             headers: {
                 'Content-Type': 'application/json',
             },
@@ -105,9 +105,13 @@ class SignIn extends Component {
             .then(data => {
                 this.setState({ isLoading: false })
                 console.log('Success:', data);
-                if (data.status == "00") {
+                if (data.status === "00") {
                     this.setState({ formControls: this.initialFormState(), formIsValid: false, formSuccess: true, formMessage: data.message })
-                    setTokenToLocalStorage(JSON.stringify(data.data.token));
+                    setTokenToLocalStorage(data.data.token);
+                    saveUserToLocalStorage(data.data.user);
+                    window.location.reload();
+                    this.props.history.push('/home');
+                    // window.location.reload();
                 } else {
                     this.setState({ formIsValid: false, formFailure: true, formMessage: data.message })
                 }
@@ -115,6 +119,7 @@ class SignIn extends Component {
             })
             .catch((error) => {
                 this.setState({ isLoading: false })
+                this.setState({ formIsValid: true, formFailure: true, formMessage: "Network Error" })
                 console.error('Error:', error);
             });
     }
@@ -150,8 +155,8 @@ class SignIn extends Component {
                                             placeholder={this.state.formControls.email.placeholderText}
                                             value={this.state.formControls.email.value}
                                             onChange={this.changeHandler}
-                                            touched={this.state.formControls.email.touched}
-                                            valid={this.state.formControls.email.valid}
+                                            touched={this.state.formControls.email.touched.toString()}
+                                            valid={this.state.formControls.email.valid.toString()}
                                             />
                                     </div>
 
@@ -161,8 +166,8 @@ class SignIn extends Component {
                                             placeholder={this.state.formControls.password.placeholderText}
                                             value={this.state.formControls.password.value}
                                             onChange={this.changeHandler}
-                                            touched={this.state.formControls.password.touched}
-                                            valid={this.state.formControls.password.valid}
+                                            touched={this.state.formControls.password.touched.toString()}
+                                            valid={this.state.formControls.password.valid.toString()}
                                             type="password"
                                             />
                                     </div>

@@ -28,7 +28,7 @@ const toolbar = ( props ) => {
                 <NavLink to="/home"> <Logo/> </NavLink>
             </div>
             <nav className="DesktopOnly">
-                <NavigationItems />
+                <NavigationItems currentUser={props.currentUser} signout={props.signout} />
             </nav>
             <DrawerToggle clicked={props.drawerToggleClicked} />
         </header>

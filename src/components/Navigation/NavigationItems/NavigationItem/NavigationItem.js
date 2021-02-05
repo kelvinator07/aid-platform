@@ -7,7 +7,7 @@ const navigationItem = ( props ) => (
     <li className="NavigationItem">
         <NavLink 
             to={props.link} 
-            activeClassName="active" onClick={props.navSelected}>
+            >
             {props.children}
         </NavLink>
     </li>

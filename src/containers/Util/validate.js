@@ -1,6 +1,7 @@
 import React from 'react';
 
 const validate = (value, rules) => {
+  // debugger;
     let isValid = true;
     
     for (let rule in rules) {

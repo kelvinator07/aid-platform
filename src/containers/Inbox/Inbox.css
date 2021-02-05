@@ -1,0 +1,20 @@
+.Inbox {
+    margin: auto;
+    width: 90%;
+    margin-top: 100px;
+    height: 100%;
+}
+
+
+.Inbox .section-title h2 {
+    margin-bottom: 20px;
+}
+
+.Inbox ul > li {
+    list-style: none;
+    margin-bottom: 10px;
+}
+
+.Inbox ul > li > .name {
+    font-weight: bold;
+}

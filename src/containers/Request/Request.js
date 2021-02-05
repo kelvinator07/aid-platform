@@ -5,6 +5,9 @@ import Button from '../../components/UI/Button/Button';
 import SelectInput from '../../components/UI/SelectInput/SelectInput';
 import validate from '../Util/validate';
 import Loader from '../../components/UI/Loader/Loader';
+import { getCurrentUser } from '../../containers/Util/auth';
+import Tabs from "../../components/Tabs/Tabs"; 
+
 
 //Makes sure location accuracy is high
 const options = {
@@ -20,9 +23,18 @@ class Request extends Component {
             error: null,
             formIsValid: false, //we will use this to track the overall form validity
             formControls: this.initialFormState(),
-            formSuccess: false
+            formSuccess: false,
+            formFailure: false,
+            formMessage: null,
+            allRequests: true,
+            requests: [],
+            currentUser: getCurrentUser()
         }
       
+    }
+
+    componentDidMount() {
+        this.fetchRequests(this.state.currentUser.id);
     }
     // selected
     initialFormState() {
@@ -38,28 +50,24 @@ class Request extends Component {
                 placeholderText: 'Enter Description',
                 touched: false
             },
-            type: {
-                value: '',
+            request_type: {
+                value: 'one_time',
                 valid: true,
-                validationRules: {
-                    isRequired: true
-                },
                 options: ['One Time', 'Material Need'],
-                placeholderText: 'Select Type',
-                touched: false
+                placeholderText: 'Select Type'
             },
             lat: {
                 value: '',
-                valid: false,
+                valid: true,
                 validationRules: {
                     isRequiredNumber: true
                 },
                 placeholderText: 'Latitude',
                 touched: false
             },
-            long: {
+            lng: {
                 value: '',
-                valid: false,
+                valid: true,
                 validationRules: {
                     isRequiredNumber: true
                 },
@@ -83,13 +91,20 @@ class Request extends Component {
         };
        
         updatedControls.lat.value = position.coords.latitude.toFixed(3)
-        updatedControls.long.value = position.coords.longitude.toFixed(3)
+        updatedControls.lng.value = position.coords.longitude.toFixed(3)
 
         updatedControls.lat.valid = validate(position.coords.latitude, updatedControls.lat.validationRules);
-        updatedControls.long.valid = validate(position.coords.longitude, updatedControls.long.validationRules);
+        updatedControls.lng.valid = validate(position.coords.longitude, updatedControls.lng.validationRules);
+
+        // debugger;
+        let formIsValid = true;
+        for (let inputIdentifier in updatedControls) {
+            formIsValid = updatedControls[inputIdentifier].valid && formIsValid;
+        }
 
         this.setState({
-            formControls: updatedControls
+            formControls: updatedControls,
+            formIsValid: formIsValid
         })
 
         console.log(this.state.formControls)
@@ -116,6 +131,35 @@ class Request extends Component {
         }
     }
 
+    fetchRequests = (user_id) => {
+        const url = `http://localhost:5000/api/v1/requests/user/${user_id}`;
+        console.log("fetchRequests url ", url);
+        fetch(url, {
+                method: 'GET',
+                headers: {
+                    'Content-Type': 'application/json',
+                    Authorization: `Bearer ${localStorage.getItem("token")}`
+                }
+            })
+            .then(res => res.json())
+            .then(
+                (result) => {
+                    console.log('fetchRequests > ', result)
+                    this.setState({
+                        isLoading: false,
+                        requests: result.requests
+                    });
+                },
+                (error) => {
+                    console.log('Error > ', error)
+                    this.setState({
+                        isLoading: false,
+                        error
+                    });
+                }
+            )
+    }
+
     changeHandler = event => {
         
         const name = event.target.name;
@@ -131,8 +175,9 @@ class Request extends Component {
         if (Number(value) === value && value % 1 !== 0) value = value.toFixed(2);
 
         updatedFormElement.value = value;
-        updatedFormElement.touched = true;
+        // updatedFormElement.touched = true;
         updatedFormElement.valid = validate(value, updatedFormElement.validationRules);
+        // debugger;
 
         updatedControls[name] = updatedFormElement;
 
@@ -162,23 +207,12 @@ class Request extends Component {
     }
 
     submitFormToApi = (formData) => {
-        const url = "http://localhost:5000/api/v1/request"
-
-        
-            // fetch("/", {
-            //     method: "post",
-            //     headers: {
-            //       "Content-Type": "application/json",
-            //       Authorization: `bearer ${JWT_TOKEN}`,
-            //     },
-            //     body: JSON.stringify(requestBody),
-            //   })
-        
+        const url = "http://localhost:5000/api/v1/requests"
         fetch(url, {
             method: 'POST', // or 'PUT'
             headers: {
                 'Content-Type': 'application/json',
-                Authorization: `bearer ${localStorage.getItem("token")}`
+                Authorization: `Bearer ${localStorage.getItem("token")}`
             },
             body: JSON.stringify(formData),
             })
@@ -186,7 +220,12 @@ class Request extends Component {
             .then(data => {
                 this.setState({ isLoading: false })
                 console.log('Success:', data);
-                this.setState({ formControls: this.initialFormState(), formIsValid: false, formSuccess: true })
+                if (data.status === "00") {
+                    this.setState({ formControls: this.initialFormState(), formIsValid: false, formSuccess: true })
+                } else {
+                    this.setState({ formFailure: true, formMessage: data.message })
+                }
+                
             })
             .catch((error) => {
                 this.setState({ isLoading: false })
@@ -196,7 +235,7 @@ class Request extends Component {
     
      render() {
 
-        const { error, isLoading } = this.state;
+        const { error, isLoading, requests } = this.state;
 
         if (error) {
             return <div>Error: {error.message}</div>;
@@ -204,86 +243,162 @@ class Request extends Component {
             return <Loader show={this.state.isLoading} />;
         } else {
 
-            return (
-
+            return(
+                
                 <div className="Request">
                     <div className="container">
 
                         <div className="section-title">
-                            <h2>Request For Help</h2>
+                            <h2>Requests</h2>
                         </div>
 
                         <div className="row d-flex justify-content-center">
                             <div className="col-12">
-                                { this.state.formSuccess ? (<h3>Your Entry Has Been Submitted. Thank You!</h3>) : null }
-                                <form className="Contact">
 
-                                    <div className="form-group">
-                                        <label>Description:</label>
-                                        <TextInput name="description" 
-                                            placeholder={this.state.formControls.description.placeholderText}
-                                            value={this.state.formControls.description.value}
-                                            onChange={this.changeHandler}
-                                            touched={this.state.formControls.description.touched}
-                                            valid={this.state.formControls.description.valid}
-                                            />
-                                    </div>
-
-
-                                    <div className="form-group">
-                                        <label>Type:</label>
-                                        <SelectInput name="type" 
-                                            placeholder={this.state.formControls.type.placeholderText}
-                                            value={this.state.formControls.type.value}
-                                            onChange={this.changeHandler}
-                                            touched={this.state.formControls.type.touched}
-                                            valid={this.state.formControls.type.valid}
-                                            options={this.state.formControls.type.options}
-                                            />
-                                    </div>
-
-                                    <div className="form-group">
-                                        <label>Location:</label>
-                                        <div className="d-flex flex-row">
-                                            <TextInput name="lat"
-                                                placeholder={this.state.formControls.lat.placeholderText}
-                                                value={this.state.formControls.lat.value}
-                                                onChange={this.changeHandler}
-                                                touched={this.state.formControls.lat.touched}
-                                                valid={this.state.formControls.lat.valid}
-                                                disabled
-                                                />
-
-                                                <TextInput name="long" className="form-control ml-3"
-                                                placeholder={this.state.formControls.long.placeholderText}
-                                                value={this.state.formControls.long.value}
-                                                onChange={this.changeHandler}
-                                                touched={this.state.formControls.long.touched}
-                                                valid={this.state.formControls.long.valid}
-                                                disabled
-                                                />
-
-                                                <div className="form-group">
-                                                <button className="btn btn-primary mx-4" type="button" onClick={this.getLocation}>Get My Location</button>
-                                                </div>
-                                                {/* <Button type="button" btnType="Primary" clicked={this.getLocation}>Get Location</Button> */}
-                                        </div>
-                                        
-                                    </div>
-
-                                    {/* <input type="btn btn-primary" value="submit" onClick={this.onSubmitForm} /> */}
-                                    <button className="btn btn-primary" onClick={this.onSubmitForm} disabled={!this.state.formIsValid} > Submit Request </button>
+                            <Tabs> 
                                 
+                                <div label="Request Form"> 
+                                    
+                                    { this.state.formSuccess ? (<h3>Your Entry Has Been Submitted. Thank You!</h3>) : null }
+                                    <form className="Contact">
 
-                                </form> 
+                                        <div className="form-group">
+                                            <label>Description:</label>
+                                            <TextInput name="description"  type="text"
+                                                placeholder={this.state.formControls.description.placeholderText}
+                                                value={this.state.formControls.description.value}
+                                                onChange={this.changeHandler}
+                                                touched={this.state.formControls.description.touched}
+                                                valid={this.state.formControls.description.valid}
+                                                />
+                                        </div>
 
-                            </div>
+
+                                        <div className="form-group">
+                                            <label>Type:</label>
+                                            <SelectInput name="request_type" 
+                                                placeholder={this.state.formControls.request_type.placeholderText}
+                                                value={this.state.formControls.request_type.value}
+                                                onChange={this.changeHandler}
+                                                options={this.state.formControls.request_type.options}
+                                                />
+                                        </div>
+
+                                        <div className="form-group">
+                                            <label>Location:</label>
+                                            <div className="d-flex flex-row">
+                                                <TextInput name="lat" type="number"
+                                                    placeholder={this.state.formControls.lat.placeholderText}
+                                                    value={this.state.formControls.lat.value}
+                                                    onChange={this.changeHandler}
+                                                    touched={this.state.formControls.lat.touched}
+                                                    valid={this.state.formControls.lat.valid}
+                                                    // disabled
+                                                    />
+
+                                                    <TextInput name="lng" type="number" className="form-control ml-3"
+                                                    placeholder={this.state.formControls.lng.placeholderText}
+                                                    value={this.state.formControls.lng.value}
+                                                    onChange={this.changeHandler}
+                                                    touched={this.state.formControls.lng.touched}
+                                                    valid={this.state.formControls.lng.valid}
+                                                    // disabled
+                                                    />
+
+                                                    <div className="form-group">
+                                                    <button className="btn btn-primary mx-4" type="button" onClick={this.getLocation}>Get My Location</button>
+                                                    </div>
+                                                    {/* <Button type="button" btnType="Primary" clicked={this.getLocation}>Get Location</Button> */}
+                                            </div>
+                                            
+                                        </div>
+
+                                        {/* <input type="btn btn-primary" value="submit" onClick={this.onSubmitForm} /> disabled={!this.state.formIsValid} */}
+                                        <button className="btn btn-primary" onClick={this.onSubmitForm}  > Submit Request </button>
+                                    
+
+                                    </form> 
+                                    
+                                </div> 
+
+                                <div label="Requests"> 
+                                    
+                                    <table class="table">
+                                        <thead>
+                                            <tr>
+                                                <th scope="col">#</th>
+                                                <th scope="col">First</th>
+                                                <th scope="col">Description</th>
+                                                <th scope="col">Fulfilled</th>
+                                                <th scope="col">Fulfilcount</th>
+                                                <th scope="col">Request Type</th>
+                                                <th scope="col">Date</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+                                            {requests.map((value, key) => {
+                                                let count = 1;
+                                                return(
+                                                    <tr key={key}>
+                                                        <th scope="row">{value.id}</th>
+                                                        <td>{count + 1}</td>
+                                                        <td>{value.description}</td>
+                                                        <td>{value.fulfilled ? "True" : "False"}</td>
+                                                        <td>{value.fulfilcount}</td>
+                                                        <td>{value.request_type}</td>
+                                                        <td>{value.created_at}</td>
+                                                    </tr>
+                                                );
+                                            })}
+                                            
+                                        </tbody>
+                                    </table>
+
+                                </div> 
+
+                            </Tabs> 
                         </div>
-
                     </div>
                 </div>
-                    
+            </div>
             );
+
+        //     return ( allRequests ? 
+
+                // <div className="Request">
+                //     <div className="container">
+
+                //         <div className="section-title">
+                //             <h2>All Requests</h2>
+                //         </div>
+
+                //         <div className="row d-flex justify-content-center">
+                //             <div className="col-12">
+                             
+
+        //                     </div>
+        //                 </div>
+
+        //             </div>
+        //         </div>
+                    
+        //     : <div className="Request">
+        //             <div className="container">
+
+        //                 <div className="section-title">
+        //                     <h2>Request For Help</h2>
+        //                 </div>
+
+        //                 <div className="row d-flex justify-content-center">
+        //                     <div className="col-12">
+                               
+
+        //                     </div>
+        //                 </div>
+
+        //             </div>
+        //         </div>
+        // );
         }
     }
 

@@ -4,28 +4,25 @@ import SideDrawer from '../Navigation/SideDrawer/SideDrawer';
 import SideBar from '../SideBar/SideBar';
 import './Layout.css';
 import ScrollArrow from '../UI/ScrollArrow/ScrollArrow';
+import { getCurrentUser, signoutUser } from '../../containers/Util/auth';
 
 
 class Layout extends Component {
 
-    state = {
-        showSideDrawer: false,
-        navBarColor: true
+    constructor () {
+        super()
     }
 
-    typed = () => {
-            //  typed
-        // if ($('.typed').length) {
-        //     var typed_strings = $(".typed").data('typed-items');
-        //     typed_strings = typed_strings.split(',')
-        //     new Typed('.typed', {
-        //     strings: typed_strings,
-        //     loop: true,
-        //     typeSpeed: 100,
-        //     backSpeed: 50,
-        //     backDelay: 2000
-        //     });
-        // }
+    componentDidMount =() => {
+        console.log("Curent User ", getCurrentUser());
+        this.setState( { currentUser: getCurrentUser() } );
+    }
+
+    state = {
+        showSideDrawer: false,
+        navBarColor: true,
+        currentUser: null,
+        authenticated: false
     }
 
     sideDrawerClosedHandler = () => {
@@ -38,15 +35,21 @@ class Layout extends Component {
         } );
     }
 
+    signout = () => {
+        console.log("Signed out")
+        signoutUser();
+        this.setState( { currentUser: null } );
+    }
+
     render() {
         return(
             <>
-                
-                <Toolbar navBarColor={this.state.navBarColor} drawerToggleClicked={this.sideDrawerToggleHandler} />
+                <Toolbar navBarColor={this.state.navBarColor} drawerToggleClicked={this.sideDrawerToggleHandler} 
+                            currentUser={this.state.currentUser} signout={this.signout} />
                 <div className="">
                     <div className="row">
                         <div className="col-md-3">
-                            <SideBar />
+                            <SideBar currentUser={this.state.currentUser} />
                         </div>
 
                         <div className="col-md-9">
@@ -62,8 +65,6 @@ class Layout extends Component {
                     </div>
 
                 </div>
-                
-               
                 <ScrollArrow />
             </>                
         );

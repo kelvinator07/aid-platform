@@ -10,7 +10,7 @@ const ImageInput = props => {
 
     return (
         <div className="form-group">
-            <input type="file" className={formControl} {...props} id={props.name} />
+            <input type="file" accept="image/png, image/jpeg, image/pdf" className={formControl} {...props} id={props.name} />
         </div>
     );
 }

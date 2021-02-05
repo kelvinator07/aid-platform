@@ -8,11 +8,6 @@ import validate from '../Util/validate';
 import Loader from '../../components/UI/Loader/Loader';
 
 
-import Modal from '../../components/UI/Modal/Modal';
-import RequestDetails from '../RequestDetails/RequestDetails';
-import ModalReact from '../../components/UI/ModalReact/ModalReact';
-
-
 class SignUp extends Component {
 
     constructor () {
@@ -102,17 +97,54 @@ class SignUp extends Component {
         // console.log(this.state.formControls)
     }
 
+    imageValueHandler = (event) => {
+        console.log("imageValueHandler ", event)
+    }
+
+    imageHandler = event => {
+        this.imageValueHandler(event);
+        // this.changeHandler(event);
+    }
+
     onSubmitForm = (event) => {
         this.setState({ isLoading: true })
         event.preventDefault();
-        const formData = {};
+        const formData = new FormData()
+
+        let photoInput = document.getElementById('picture');
+        if (photoInput.files[0]) {
+            let upload_file = photoInput.files[0]
+            formData.append("picture", upload_file);            
+        }
+
         for (let formElementId in this.state.formControls) {
             formData[formElementId] = this.state.formControls[formElementId].value;
+            formData.append(formElementId, this.state.formControls[formElementId].value);
         }
         
-        console.dir(formData);
+        for(var pair of formData.entries()) {
+            console.log(pair[0]+ ', '+ pair[1]); 
+        }
         this.submitFormToApi(formData);
+
     }
+
+    _handleImageChange(e) {
+        e.preventDefault();
+    
+        let reader = new FileReader();
+        let file = e.target.files[0];
+    
+        reader.onloadend = () => {
+            console.log("file ", file);
+          this.setState({
+            // file: file,
+            // imagePreviewUrl: reader.result
+          });
+        }
+    
+        reader.readAsDataURL(file)
+      }
 
     submitFormToApi = (formData) => {
         const url = "http://localhost:5000/api/v1/signup"
@@ -122,13 +154,13 @@ class SignUp extends Component {
             headers: {
                 'Content-Type': 'application/json',
             },
-            body: JSON.stringify(formData),
+            body: formData,
             })
             .then(response => response.json())
             .then(data => {
                 this.setState({ isLoading: false })
                 console.log('Success:', data);
-                if (data.status == "00") {
+                if (data.status === "00") {
                     this.setState({ formControls: this.initialFormState(), formIsValid: false, formSuccess: true, formMessage: data.message })
                 } else {
                     this.setState({ formIsValid: false, formFailure: true, formMessage: data.message })
@@ -136,6 +168,7 @@ class SignUp extends Component {
             })
             .catch((error) => {
                 this.setState({ isLoading: false })
+                this.setState({ formIsValid: true, formFailure: true, formMessage: "Network Error" })
                 console.error('Error:', error);
             });
 
@@ -164,7 +197,7 @@ class SignUp extends Component {
                             <div className="col-12">
                                 { this.state.formSuccess ? (<h3>{ this.state.formMessage }</h3>) : null }
                                 { this.state.formFailure ? (<h3>{ this.state.formMessage }</h3>) : null }
-                                <form className="Contact">
+                                <form className="Contact" encType="multipart/form-data">
 
                                     <div className="form-group">
                                         <label>First Name:</label>
@@ -206,6 +239,7 @@ class SignUp extends Component {
                                             placeholder={this.state.formControls.picture.placeholderText}
                                             value={this.state.formControls.picture.value}
                                             onChange={this.changeHandler}
+                                            // onChange={(e)=>this._handleImageChange(e)}
                                             touched={this.state.formControls.picture.touched}
                                             valid={this.state.formControls.picture.valid}
                                             />
@@ -221,11 +255,7 @@ class SignUp extends Component {
                                     <button className="btn btn-primary" onClick={this.onSubmitForm} disabled={!this.state.formIsValid} > Sign Up </button>
                                     
 
-                                </form> 
-
-                                <ModalReact show={true} >
-                                    <RequestDetails />
-                                </ModalReact>
+                                </form>
 
                             </div>
                         </div>
