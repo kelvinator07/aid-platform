@@ -10,7 +10,7 @@ const navigationItems = (props) => {
     
         props.currentUser ? <ul className="NavigationItems"> 
                     <NavigationItem link="/home">Home</NavigationItem>
-                    <NavigationItem link="/profile">Profile</NavigationItem>
+                    {/* <NavigationItem link="/profile">Profile</NavigationItem> */}
                     <NavigationItem link="/inbox" >Inbox</NavigationItem>
                     <NavigationItem link="/request" >Request</NavigationItem>
                     <li className="NavigationItem">

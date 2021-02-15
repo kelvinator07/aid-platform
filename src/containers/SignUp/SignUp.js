@@ -6,12 +6,14 @@ import ImageInput from '../../components/UI/ImageInput/ImageInput';
 
 import validate from '../Util/validate';
 import Loader from '../../components/UI/Loader/Loader';
+import { SERVER_API_URL } from '../../constants'
 
 
 class SignUp extends Component {
 
     constructor () {
         super()
+        this.myRef = React.createRef();
         this.state = {
             isLoading: false,
             error: null,
@@ -19,7 +21,8 @@ class SignUp extends Component {
             formControls: this.initialFormState(),
             formSuccess: false,
             formFailure: false,
-            formMessage: null
+            formMessage: null,
+            file: null 
         }
       
     }
@@ -46,6 +49,16 @@ class SignUp extends Component {
                 placeholderText: 'Enter Last Name',
                 touched: false
             },
+            password: {
+                value: '',
+                valid: false,
+                validationRules: {
+                    minLength: 5,
+                    isRequired: true
+                },
+                placeholderText: 'Enter password',
+                touched: false
+            },
             email: {
                 value: '',
                 valid: false,
@@ -53,15 +66,6 @@ class SignUp extends Component {
                     isRequired: true
                 },
                 placeholderText: 'Enter Email Address',
-                touched: false
-            },
-            picture: {
-                value: '',
-                valid: false,
-                validationRules: {
-                    isRequired: true
-                },
-                placeholderText: 'Enter Picture',
                 touched: false
             }
         }
@@ -111,20 +115,23 @@ class SignUp extends Component {
         event.preventDefault();
         const formData = new FormData()
 
-        let photoInput = document.getElementById('picture');
-        if (photoInput.files[0]) {
-            let upload_file = photoInput.files[0]
-            formData.append("picture", upload_file);            
-        }
-
         for (let formElementId in this.state.formControls) {
             formData[formElementId] = this.state.formControls[formElementId].value;
             formData.append(formElementId, this.state.formControls[formElementId].value);
         }
-        
-        for(var pair of formData.entries()) {
-            console.log(pair[0]+ ', '+ pair[1]); 
-        }
+
+        // let photoInput = document.getElementById('picture');
+        // if (photoInput.files[0]) {
+        //     let upload_file = photoInput.files[0]
+        //     formData.append("picture", this.state.file);            
+        // }
+        let file = this.myRef.current.files[0];
+        formData.append("picture", file);
+        // console.log('myRef ', this.myRef.current.files[0])
+        // for(var pair of formData.entries()) {
+        //     console.log(pair[0]+ ', '+ pair[1]); 
+        // }
+        // console.log('formData ', formData)
         this.submitFormToApi(formData);
 
     }
@@ -138,7 +145,7 @@ class SignUp extends Component {
         reader.onloadend = () => {
             console.log("file ", file);
           this.setState({
-            // file: file,
+            file: file,
             // imagePreviewUrl: reader.result
           });
         }
@@ -147,21 +154,17 @@ class SignUp extends Component {
       }
 
     submitFormToApi = (formData) => {
-        const url = "http://localhost:5000/api/v1/signup"
+        const url = `${SERVER_API_URL}/api/v1/signup`
         
         fetch(url, {
             method: 'POST', // or 'PUT'
-            headers: {
-                'Content-Type': 'application/json',
-            },
             body: formData,
             })
             .then(response => response.json())
             .then(data => {
                 this.setState({ isLoading: false })
-                console.log('Success:', data);
                 if (data.status === "00") {
-                    this.setState({ formControls: this.initialFormState(), formIsValid: false, formSuccess: true, formMessage: data.message })
+                    this.setState({ formControls: this.initialFormState(), formIsValid: false, formSuccess: true, formMessage: 'Registration Sucsessful.' })
                 } else {
                     this.setState({ formIsValid: false, formFailure: true, formMessage: data.message })
                 }
@@ -223,6 +226,18 @@ class SignUp extends Component {
                                     </div>
 
                                     <div className="form-group">
+                                        <label>Password:</label>
+                                        <TextInput name="password" 
+                                            type="password"
+                                            placeholder={this.state.formControls.password.placeholderText}
+                                            value={this.state.formControls.password.value}
+                                            onChange={this.changeHandler}
+                                            touched={this.state.formControls.password.touched}
+                                            valid={this.state.formControls.password.valid}
+                                            />
+                                    </div>
+
+                                    <div className="form-group">
                                         <label>Email Address:</label>
                                         <EmailInput name="email" 
                                             placeholder={this.state.formControls.email.placeholderText}
@@ -234,26 +249,19 @@ class SignUp extends Component {
                                     </div>
 
                                     <div className="form-group">
-                                        <label>Picture:</label>
-                                        <ImageInput name="picture" 
-                                            placeholder={this.state.formControls.picture.placeholderText}
-                                            value={this.state.formControls.picture.value}
-                                            onChange={this.changeHandler}
+                                        <label htmlFor="picture">Picture:</label>
+                                        <input type="file" ref={this.myRef}  name="picture"
+                                        accept="image/png, image/jpeg, image/pdf" className="form-control-file" />
+
+                                        {/* <ImageInput name="picture" 
+                                            ref={this.myRef}
+                                            placeholder="Choose a pic"
+                                            // onChange={this.changeHandler}
                                             // onChange={(e)=>this._handleImageChange(e)}
-                                            touched={this.state.formControls.picture.touched}
-                                            valid={this.state.formControls.picture.valid}
-                                            />
+                                            /> */}
                                     </div>
 
-                                    {/*                                     
-                                    <div className="custom-file">
-                                        <input type="file" className="custom-file-input" id="customFile"/>
-                                        <label className="custom-file-label" for="customFile">Choose file</label>
-                                    </div> */}
-
-                                    {/* <input type="btn btn-primary" value="submit" onClick={this.onSubmitForm} /> */}
                                     <button className="btn btn-primary" onClick={this.onSubmitForm} disabled={!this.state.formIsValid} > Sign Up </button>
-                                    
 
                                 </form>
 

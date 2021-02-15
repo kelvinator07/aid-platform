@@ -1,10 +1,11 @@
-import React, { Component, useEffect, useState } from "react";
+import React, { Component } from "react";
 import './Home.css';
 import Map from "../Map/Map";
 import ModalReact from '../../components/UI/ModalReact/ModalReact';
 import RequestDetails from '../RequestDetails/RequestDetails';
 import getLocation from '../Util/location';
 import authHeader from '../Util/auth-header';
+import { SERVER_API_URL } from '../../constants'
 
 class Home extends Component {
 
@@ -25,11 +26,10 @@ class Home extends Component {
         this.fetchRequests();
         const loc = getLocation();
         this.setState({ location : loc })
-        console.log("this.setState ", this.state.location)
     }
 
     fetchRequests = () => {
-        const url = "http://localhost:5000/api/v1/requests";
+        const url = `${SERVER_API_URL}/api/v1/requests`;
         fetch(url, {
                 method: 'GET',
                 headers: {
@@ -40,9 +40,10 @@ class Home extends Component {
             .then(res => res.json())
             .then(
                 (result) => {
-                    console.log('Data > ', result)
-                    if (result.total > 1) {
-                        const filt = result.requests.filter(res => res.fulfilled == false || res.fulfilcount >= 5);
+                    if (result.total > 0) {
+                        const oneDay = 60 * 60 * 24 * 1000;
+                        const filt = result.requests.filter(res => res.fulfilled == false || (res.fulfilled == false && res.fulfilcount < 5) || (res.fulfilcount >= 5 && (Date.parse(new Date()) - Date.parse(res.updated_at)) < oneDay));
+                        console.log("1 ", filt)
                          let newObject = filt.map(obj => {
                             let fina =  {}
                             fina = { ...obj, latlng:[] }
@@ -67,7 +68,7 @@ class Home extends Component {
     }
 
     updateRequest = (request) => {
-        const url = `http://localhost:5000/api/v1/requests/${request.id}`;
+        const url = `${SERVER_API_URL}/api/v1/requests/${request.id}`;
         fetch(url, {
                 method: 'PUT',
                 headers: {
@@ -78,9 +79,7 @@ class Home extends Component {
             })
             .then(res => res.json())
             .then(
-                (result) => {
-                    console.log('uPDATED rEQUEST > ', result)
-                    
+                (result) => {                    
                     this.setState({
                         isLoading: false,
                         request: result.data
@@ -116,14 +115,12 @@ class Home extends Component {
       }
 
     requestCancel = () => {
-        console.log("RE requestCancel")
         this.setState({requestSelected: false})
     }
 
     handleVolunteer = () => {
         let request = { ...this.state.request }
         request.fulfilcount = request.fulfilcount + 1
-        console.log("Update Volunteer ID ", request)
         this.updateRequest(request);
     }
 

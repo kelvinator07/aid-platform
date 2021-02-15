@@ -2,6 +2,7 @@ import React, { Component } from "react";
 import './Profile.css';
 import { getCurrentUser } from '../../containers/Util/auth';
 import ImageInput from '../../components/UI/ImageInput/ImageInput';
+import { SERVER_API_URL } from '../../constants'
 
 class Profile extends Component {
 
@@ -27,7 +28,7 @@ class Profile extends Component {
 
 
     updatePicture = (formData) => {
-        const url = "http://localhost:5000/api/v1/user";
+        const url = `${SERVER_API_URL}/api/v1/user`;
         fetch(url, {
                 method: 'PUT',
                 headers: {
@@ -38,9 +39,7 @@ class Profile extends Component {
             })
             .then(res => res.json())
             .then(
-                (result) => {
-                    console.log('Data > ', result)
-                    
+                (result) => {                    
                     this.setState({
                         isLoading: false,
                         requests: result.requests
@@ -121,7 +120,7 @@ class Profile extends Component {
                                     <ImageInput name="picture" 
                                         placeholder="Upload a picture"
                                         value={this.state.picture}
-                                        onChange={this.changeHandler}
+                                        onChange={this.handleChange}
                                         // onChange={(e)=>this._handleImageChange(e)}
                                         />
                                 </div>

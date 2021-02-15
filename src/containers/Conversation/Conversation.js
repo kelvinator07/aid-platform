@@ -2,20 +2,7 @@ import React, { Component } from "react";
 import './Conversation.css';
 import TextInput from '../../components/UI/TextInput/TextInput';
 import { getCurrentUser } from '../../containers/Util/auth';
-
-
-const DUMMY_DATA = [
-    {
-        requestId:1,
-        name: "perborgen",
-        body: "who'll win?"
-    },
-    {
-        requestId:2,
-        name: "janedoe",
-        body: "who'll win?"
-    }
-  ]
+import { SERVER_API_URL } from '../../constants'
 
 class Conversation extends Component {
 
@@ -26,7 +13,7 @@ class Conversation extends Component {
             isLoading: true,
             requests: [],
             places: [],
-            messages: DUMMY_DATA,
+            messages: [],
             message: "",
             query: "",
             requestId: null,
@@ -42,12 +29,11 @@ class Conversation extends Component {
         const { currentUser }  = this.state
         this.setState({ name: currentUser.firstname + " " + currentUser.lastname });
         this.setState({ requestId: this.props.location.search.split("=")[1] });
-        console.log("requestId ", this.props.location.search.split("=")[1]);
         this.fetchMessages(this.props.location.search.split("=")[1]);
     }
 
     fetchMessages = (requestId) => {
-        const url = `http://localhost:5000/api/v1/messages/${requestId}`;
+        const url = `${SERVER_API_URL}/api/v1/messages/${requestId}`;
         fetch(url, {
                 method: 'GET',
                 headers: {
@@ -57,9 +43,7 @@ class Conversation extends Component {
             })
             .then(res => res.json())
             .then(
-                (result) => {
-                    console.log('fetchMessages > ', result)
-                    
+                (result) => {                    
                     this.setState({
                         isLoading: false,
                         messages: result.messages
@@ -76,7 +60,7 @@ class Conversation extends Component {
     }
 
     sendMessage = (formData) => {
-        const url = `http://localhost:5000/api/v1/messages`;
+        const url = `${SERVER_API_URL}/api/v1/messages`;
         fetch(url, {
                 method: 'POST',
                 headers: {
@@ -88,7 +72,6 @@ class Conversation extends Component {
             .then(res => res.json())
             .then(
                 (result) => {
-                    console.log('sendMessage > ', result)
                     this.setState({
                         isLoading: false,
                         message: '',
@@ -112,7 +95,6 @@ class Conversation extends Component {
                 name: this.state.name,
                 request_id: parseInt(this.state.requestId)
             }
-            console.log("FD " , data)
             this.sendMessage(data);
         }
         

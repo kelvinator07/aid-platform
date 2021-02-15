@@ -23,10 +23,7 @@ const RequestDetails = (props) => {
         const history = useHistory();
         const handleClick = () => history.push('/conversation');
         let match = useRouteMatch();
-
-        // console.log("match s ", match.url)
-            console.log("props sun ", props.request)
-
+        
             return (
                 <>
                 {props.request.id && (

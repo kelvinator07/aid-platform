@@ -3,8 +3,7 @@ import './Map.css'
 import markerIcon from 'leaflet/dist/images/marker-icon.png'
 import markerIconRed from '../../assets/images/pin.png'
 
-import markerShadow from 'leaflet/dist/images/marker-shadow.png'
-import { MapContainer, TileLayer, Popup, Marker } from 'react-leaflet'
+import { MapContainer, TileLayer, Marker } from 'react-leaflet'
 import L from 'leaflet'
 
 const blueIcon = L.icon({
@@ -16,7 +15,7 @@ const blueIcon = L.icon({
 })
 
 const redIcon = L.icon({
-    iconUrl: markerIconRed,
+    iconUrl: 'https://img.icons8.com/color/48/000000/marker.png',
     iconAnchor: [22, 94],
     popupAnchor: [-3, -76],
     shadowSize: [68, 95],
@@ -31,7 +30,7 @@ const handleClick = (value) => {
 
   
 const Map = (props) => {
-  console.log("Props check ", props.requests);
+  // console.log("Props check ", props.requests);
   // [51.505, -0.09]
   return (
     <MapContainer center={[6.557, 3.349]} zoom={13} scrollWheelZoom={false} style={{ height: '500px' }}>

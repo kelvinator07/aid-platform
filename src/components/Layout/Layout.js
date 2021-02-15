@@ -14,7 +14,6 @@ class Layout extends Component {
     }
 
     componentDidMount =() => {
-        console.log("Curent User ", getCurrentUser());
         this.setState( { currentUser: getCurrentUser() } );
     }
 
@@ -36,7 +35,6 @@ class Layout extends Component {
     }
 
     signout = () => {
-        console.log("Signed out")
         signoutUser();
         this.setState( { currentUser: null } );
     }

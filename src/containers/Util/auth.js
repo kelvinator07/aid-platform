@@ -1,9 +1,5 @@
 import React from 'react'
 
-const setUser = (user) => {
-    
-}
-
 const setTokenToLocalStorage = (token) => {
     localStorage.setItem("token", token);
 }
@@ -24,7 +20,6 @@ const removeTokenFromLocalStorage = () => {
 const signoutUser = () => {
     localStorage.removeItem("token");
     localStorage.removeItem("user");
-    console.log("Signed out 2")
 }
 
 export { setTokenToLocalStorage, removeTokenFromLocalStorage, saveUserToLocalStorage, getCurrentUser, signoutUser } ;

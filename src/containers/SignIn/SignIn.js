@@ -4,7 +4,7 @@ import TextInput from '../../components/UI/TextInput/TextInput';
 import EmailInput from '../../components/UI/EmailInput/EmailInput';
 import validate from '../Util/validate';
 import { setTokenToLocalStorage, removeTokenFromLocalStorage, saveUserToLocalStorage } from '../Util/auth';
-
+import { SERVER_API_URL } from '../../constants'
 import Loader from '../../components/UI/Loader/Loader';
 
 class SignIn extends Component {
@@ -87,12 +87,11 @@ class SignIn extends Component {
             formData[formElementId] = this.state.formControls[formElementId].value;
         }
         
-        console.dir(formData);
         this.submitFormToApi(formData);
     }
 
     submitFormToApi = (formData) => {
-        const url = "http://localhost:5000/api/v1/login"
+        const url = `${SERVER_API_URL}/api/v1/login`
         
         fetch(url, {
             method: 'POST',
@@ -104,7 +103,6 @@ class SignIn extends Component {
             .then(response => response.json())
             .then(data => {
                 this.setState({ isLoading: false })
-                console.log('Success:', data);
                 if (data.status === "00") {
                     this.setState({ formControls: this.initialFormState(), formIsValid: false, formSuccess: true, formMessage: data.message })
                     setTokenToLocalStorage(data.data.token);

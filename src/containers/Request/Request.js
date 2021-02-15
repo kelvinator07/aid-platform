@@ -7,6 +7,8 @@ import validate from '../Util/validate';
 import Loader from '../../components/UI/Loader/Loader';
 import { getCurrentUser } from '../../containers/Util/auth';
 import Tabs from "../../components/Tabs/Tabs"; 
+import moment from 'moment'
+import { SERVER_API_URL } from '../../constants'
 
 
 //Makes sure location accuracy is high
@@ -107,8 +109,6 @@ class Request extends Component {
             formIsValid: formIsValid
         })
 
-        console.log(this.state.formControls)
-
         console.log(`Current Latitude is ${position.coords.latitude} and your longitude is ${position.coords.longitude}`);
     }
 
@@ -132,8 +132,7 @@ class Request extends Component {
     }
 
     fetchRequests = (user_id) => {
-        const url = `http://localhost:5000/api/v1/requests/user/${user_id}`;
-        console.log("fetchRequests url ", url);
+        const url = `${SERVER_API_URL}/api/v1/requests/user/${user_id}`;
         fetch(url, {
                 method: 'GET',
                 headers: {
@@ -144,10 +143,10 @@ class Request extends Component {
             .then(res => res.json())
             .then(
                 (result) => {
-                    console.log('fetchRequests > ', result)
+                    const sortedRequests = result.requests.slice().sort((a, b) => a.created_at > b.created_at ? -1 : 1)
                     this.setState({
                         isLoading: false,
-                        requests: result.requests
+                        requests: sortedRequests
                     });
                 },
                 (error) => {
@@ -158,6 +157,55 @@ class Request extends Component {
                     });
                 }
             )
+    }
+
+    updateRequest = (request) => {
+        const url = `${SERVER_API_URL}/api/v1/requests/${request.id}`;
+        fetch(url, {
+                method: 'PUT',
+                headers: {
+                    'Content-Type': 'application/json',
+                    Authorization: `Bearer ${localStorage.getItem("token")}`
+                },
+                body: JSON.stringify(request),
+            })
+            .then(res => res.json())
+            .then(
+                (result) => {                    
+                    this.setState({
+                        isLoading: false,
+                        request: result.data
+                    });
+                },
+                (error) => {
+                    console.log('Error > ', error)
+                    this.setState({
+                        isLoading: false,
+                        error
+                    });
+                }
+            )
+    }
+
+    handleUpdate = (request) => {
+        // const target = event.target;
+        // var value = target.value;
+        
+        // if(target.checked){
+        //     // this.state.hobbies[value] = value;   
+        //     console.log("value ", value)
+        // }else{
+        //     // this.state.hobbies.splice(value, 1);
+        //     console.log("value else ", value)
+        // }
+        let req = { ...request }
+        req.fulfilled = !req.fulfilled
+        this.updateRequest(req);
+    }
+
+    handleRepublish = (value) => {
+        console.log("value ", value)
+        // this.updateRequest(request);
     }
 
     changeHandler = event => {
@@ -191,7 +239,7 @@ class Request extends Component {
             formIsValid: formIsValid
         });
 
-        console.log(this.state.formControls)
+        // console.log(this.state.formControls)
     }
 
     onSubmitForm = (event) => {
@@ -202,12 +250,12 @@ class Request extends Component {
             formData[formElementId] = this.state.formControls[formElementId].value;
         }
         
-        console.dir(formData);
+        // console.dir(formData);
         this.submitFormToApi(formData);
     }
 
     submitFormToApi = (formData) => {
-        const url = "http://localhost:5000/api/v1/requests"
+        const url = `${SERVER_API_URL}/api/v1/requests`
         fetch(url, {
             method: 'POST', // or 'PUT'
             headers: {
@@ -219,7 +267,6 @@ class Request extends Component {
             .then(response => response.json())
             .then(data => {
                 this.setState({ isLoading: false })
-                console.log('Success:', data);
                 if (data.status === "00") {
                     this.setState({ formControls: this.initialFormState(), formIsValid: false, formSuccess: true })
                 } else {
@@ -259,7 +306,7 @@ class Request extends Component {
                                 
                                 <div label="Request Form"> 
                                     
-                                    { this.state.formSuccess ? (<h3>Your Entry Has Been Submitted. Thank You!</h3>) : null }
+                                    { this.state.formSuccess ? (<h3>Your Request Has Been Submitted. Thank You!</h3>) : null }
                                     <form className="Contact">
 
                                         <div className="form-group">
@@ -323,30 +370,43 @@ class Request extends Component {
 
                                 <div label="Requests"> 
                                     
-                                    <table class="table">
+                                    <table className="table">
                                         <thead>
                                             <tr>
                                                 <th scope="col">#</th>
-                                                <th scope="col">First</th>
                                                 <th scope="col">Description</th>
-                                                <th scope="col">Fulfilled</th>
+                                                {/* <th scope="col">Fulfilled</th> */}
                                                 <th scope="col">Fulfilcount</th>
                                                 <th scope="col">Request Type</th>
                                                 <th scope="col">Date</th>
+                                                <th scope="col">Mark As Fufilled</th>
+                                                {/* <th scope="col">Republish</th> */}
                                             </tr>
                                         </thead>
                                         <tbody>
                                             {requests.map((value, key) => {
-                                                let count = 1;
                                                 return(
-                                                    <tr key={key}>
-                                                        <th scope="row">{value.id}</th>
-                                                        <td>{count + 1}</td>
+                                                    <tr key={value.id}>
+                                                        <th scope="row">{key+1}</th>
                                                         <td>{value.description}</td>
-                                                        <td>{value.fulfilled ? "True" : "False"}</td>
+                                                        {/* <td>{value.fulfilled ? "True" : "False"}</td> */}
                                                         <td>{value.fulfilcount}</td>
-                                                        <td>{value.request_type}</td>
-                                                        <td>{value.created_at}</td>
+                                                        <td>{value.request_type.replace("_"," ")}</td>
+                                                        <td>{moment(value.created_at).format('MM/DD/YYYY')}</td>
+                                                        <td>
+                                                        <div className="form-check">
+                                                            <input className="form-check-input position-static" 
+                                                            type="checkbox" 
+                                                            defaultChecked={value.fulfilled}
+                                                            name={value.description} 
+                                                            id={value.id} 
+                                                            value={value}
+                                                            onClick={() => this.handleUpdate(value)} />
+                                                        </div>
+                                                        </td>
+                                                        {/* <td value={value} onClick={() => this.handleRepublish(value)}>
+                                                            <button className="btn btn-primary"> Click </button>
+                                                        </td> */}
                                                     </tr>
                                                 );
                                             })}
@@ -362,70 +422,9 @@ class Request extends Component {
                 </div>
             </div>
             );
-
-        //     return ( allRequests ? 
-
-                // <div className="Request">
-                //     <div className="container">
-
-                //         <div className="section-title">
-                //             <h2>All Requests</h2>
-                //         </div>
-
-                //         <div className="row d-flex justify-content-center">
-                //             <div className="col-12">
-                             
-
-        //                     </div>
-        //                 </div>
-
-        //             </div>
-        //         </div>
-                    
-        //     : <div className="Request">
-        //             <div className="container">
-
-        //                 <div className="section-title">
-        //                     <h2>Request For Help</h2>
-        //                 </div>
-
-        //                 <div className="row d-flex justify-content-center">
-        //                     <div className="col-12">
-                               
-
-        //                     </div>
-        //                 </div>
-
-        //             </div>
-        //         </div>
-        // );
         }
     }
 
 };
 
 export default Request;
-
-// {
-//     "id": 1,
-//     "name": "Leanne Graham",
-//     "username": "Bret",
-//     "email": "Sincere@april.biz",
-//     "address": {
-//       "street": "Kulas Light",
-//       "suite": "Apt. 556",
-//       "city": "Gwenborough",
-//       "zipcode": "92998-3874",
-//       "geo": {
-//         "lat": "-37.3159",
-//         "lng": "81.1496"
-//       }
-//     },
-//     "phone": "1-770-736-8031 x56442",
-//     "website": "hildegard.org",
-//     "company": {
-//       "name": "Romaguera-Crona",
-//       "catchPhrase": "Multi-layered client-server neural-net",
-//       "bs": "harness real-time e-markets"
-//     }
-//   },

@@ -1,26 +1,15 @@
 import React, { Component } from "react";
 import './Inbox.css';
 import TextInput from '../../components/UI/TextInput/TextInput';
+import { getCurrentUser } from '../../containers/Util/auth';
+import { NavLink, Link } from "react-router-dom";
+import { SERVER_API_URL } from '../../constants'
 
-
-const DUMMY_DATA = [
-    {
-        id:1,
-      senderId: "perborgen",
-      text: "who'll win?"
-    },
-    {
-        id:2,
-      senderId: "janedoe",
-      text: "who'll win?"
-    }
-  ]
 
 class Inbox extends Component {
 
     constructor(props) {
         super(props);
-        console.log("props con ", this.props)
         this.state = {
             error: null,
             isLoading: true,
@@ -28,24 +17,22 @@ class Inbox extends Component {
             places: [],
             request: null,
             requestSelected: false,
-            messages: DUMMY_DATA,
+            messages: [],
             message: "",
             query: "",
-            requestId: null
+            requestId: null,
+            currentUser: getCurrentUser()
         }
     }
 
     // Get all requests by user id
     // Get all messages where request id in requests
     componentDidMount() {
-        this.fetchMessages();
-        // this.setState({ requestId: this.props.location.search.split("=")[1] });
-        // console.log("requestId ", this.props.location.search.split("=")[1]);
+        this.fetchMessages(this.state.currentUser.id);
     }
 
-
-    fetchMessages = () => {
-        const url = "http://localhost:5000/api/v1/messages";
+    fetchMessages = (user_id) => {
+        const url = `${SERVER_API_URL}/api/v1/messagebyuser/${user_id}`;
         fetch(url, {
                 method: 'GET',
                 headers: {
@@ -55,12 +42,10 @@ class Inbox extends Component {
             })
             .then(res => res.json())
             .then(
-                (result) => {
-                    console.log('Data > ', result)
-                    
+                (result) => {                    
                     this.setState({
                         isLoading: false,
-                        requests: result.requests
+                        messages: result.messages
                     });
                 },
                 (error) => {
@@ -104,17 +89,44 @@ class Inbox extends Component {
                                     <ul className="list-group list-group-flush message-list flex-container column">                 
                                         {this.state.messages.map(message => {
                                         return (
-                                        <li className="list-group-item" key={message.id}>
-                                            <div className="name">
-                                            {message.senderId}
-                                            </div>
-                                            <div className="text">
-                                            {message.text}
-                                            </div>
-                                        </li>
+                                        <NavLink 
+                                                to={`/conversation?requestid=${message.request_id}`} >
+                                                <li className="list-group-item" key={message.id}>
+                                                    
+                                                    <div className="name">
+                                                    {message.name}
+                                                    </div>
+                                                    <div className="text">
+                                                    {message.body}
+                                                    </div>
+                                                </li>
+                                        </NavLink>
                                         )
                                     })}
                                     </ul>
+                                    {/* <Link to={`/conversation?requestid=${props.request.id}`} ><Button btnType="Success"> VOLUNTEER </Button></Link> */}
+
+                                    {/* <div className="list-group">
+                                            {this.state.messages.map(message => {
+                                                return (
+                                                    <li className="list-group-item" key={message.id}>
+<Link 
+                                                    to={`/conversation?requestid=${message.request_id}`} >
+                                                        <div className="name">
+                                                        {message.name}
+                                                        </div>
+                                                        <div className="text">
+                                                        {message.body}
+                                                        </div>
+                                                </Link>
+
+                                                    </li>
+                                                    
+                                                )
+                                            })}
+                                       
+                                        {/* <a href="#" className="list-group-item list-group-item-action disabled">Vestibulum at eros</a> */}
+                                    {/* </div> */}
 
                             </div>
                             </div>
