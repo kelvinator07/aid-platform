@@ -15,6 +15,7 @@ class Layout extends Component {
 
     componentDidMount =() => {
         this.setState( { currentUser: getCurrentUser() } );
+        console.log("Props Layout > ", this.props)
     }
 
     state = {
@@ -52,6 +53,7 @@ class Layout extends Component {
 
                         <div className="col-md-9">
                         <SideDrawer
+                            currentUser={this.state.currentUser}
                             open={this.state.showSideDrawer}
                             closed={this.sideDrawerClosedHandler}      
                             drawerToggleClicked={this.sideDrawerClosedHandler}/>

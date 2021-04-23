@@ -30,7 +30,8 @@ class Request extends Component {
             formMessage: null,
             allRequests: true,
             requests: [],
-            currentUser: getCurrentUser()
+            currentUser: getCurrentUser(),
+            disabled: false
         }
       
     }
@@ -174,7 +175,8 @@ class Request extends Component {
                 (result) => {                    
                     this.setState({
                         isLoading: false,
-                        request: result.data
+                        request: result.data,
+                        disabled: !this.state.disabled
                     });
                 },
                 (error) => {
@@ -203,9 +205,37 @@ class Request extends Component {
         this.updateRequest(req);
     }
 
-    handleRepublish = (value) => {
-        console.log("value ", value)
-        // this.updateRequest(request);
+    republishRequest = (request_id) => {
+        const url = `${SERVER_API_URL}/api/v1/requests/republish/${request_id}`;
+        fetch(url, {
+                method: 'PUT',
+                headers: {
+                    'Content-Type': 'application/json',
+                    Authorization: `Bearer ${localStorage.getItem("token")}`
+                },
+                body: null,
+            })
+            .then(res => res.json())
+            .then(
+                (result) => {                    
+                    this.setState({
+                        isLoading: false,
+                        request: result.data,
+                        disabled: !this.state.disabled
+                    });
+                },
+                (error) => {
+                    console.log('Error > ', error)
+                    this.setState({
+                        isLoading: false,
+                        error
+                    });
+                }
+            )
+    }
+
+    handleRepublish = (request_id) => {
+        this.republishRequest(request_id);
     }
 
     changeHandler = event => {
@@ -250,7 +280,7 @@ class Request extends Component {
             formData[formElementId] = this.state.formControls[formElementId].value;
         }
         
-        // console.dir(formData);
+        console.dir(formData);
         this.submitFormToApi(formData);
     }
 
@@ -376,11 +406,11 @@ class Request extends Component {
                                                 <th scope="col">#</th>
                                                 <th scope="col">Description</th>
                                                 {/* <th scope="col">Fulfilled</th> */}
-                                                <th scope="col">Fulfilcount</th>
+                                                {/* <th scope="col">Fulfilcount</th> */}
                                                 <th scope="col">Request Type</th>
                                                 <th scope="col">Date</th>
                                                 <th scope="col">Mark As Fufilled</th>
-                                                {/* <th scope="col">Republish</th> */}
+                                                <th scope="col">Republish</th>
                                             </tr>
                                         </thead>
                                         <tbody>
@@ -390,7 +420,7 @@ class Request extends Component {
                                                         <th scope="row">{key+1}</th>
                                                         <td>{value.description}</td>
                                                         {/* <td>{value.fulfilled ? "True" : "False"}</td> */}
-                                                        <td>{value.fulfilcount}</td>
+                                                        {/* <td>{value.fulfilcount}</td> */}
                                                         <td>{value.request_type.replace("_"," ")}</td>
                                                         <td>{moment(value.created_at).format('MM/DD/YYYY')}</td>
                                                         <td>
@@ -401,12 +431,13 @@ class Request extends Component {
                                                             name={value.description} 
                                                             id={value.id} 
                                                             value={value}
+                                                            disabled={value.fulfilled}
                                                             onClick={() => this.handleUpdate(value)} />
                                                         </div>
                                                         </td>
-                                                        {/* <td value={value} onClick={() => this.handleRepublish(value)}>
+                                                        <td onClick={() => this.handleRepublish(value.id)}>
                                                             <button className="btn btn-primary"> Click </button>
-                                                        </td> */}
+                                                        </td>
                                                     </tr>
                                                 );
                                             })}

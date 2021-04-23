@@ -1,0 +1,20 @@
+.Chat {
+    margin: auto;
+    width: 90%;
+    margin-top: 100px;
+    height: 100%;
+}
+
+
+.Chat .section-title h2 {
+    margin-bottom: 20px;
+}
+
+.Chat ul > li {
+    list-style: none;
+    margin-bottom: 10px;
+}
+
+.Chat ul > li > .name {
+    font-weight: bold;
+}

@@ -1,10 +1,10 @@
 import React, { Component } from "react";
-import './Conversation.css';
+import './Chat.css';
 import TextInput from '../../components/UI/TextInput/TextInput';
 import { getCurrentUser } from '../../containers/Util/auth';
 import { SERVER_API_URL } from '../../constants'
 
-class Conversation extends Component {
+class Chat extends Component {
 
     constructor(props) {
         super(props);
@@ -17,7 +17,7 @@ class Conversation extends Component {
             message: "",
             query: "",
             requestId: null,
-            conversationId: null,
+            responseId: null,
             name: "",
             currentUser: getCurrentUser()
         }
@@ -27,15 +27,16 @@ class Conversation extends Component {
     // Re activate updated_at
 
     componentDidMount() {
+        console.log("Props chat > ", this.props)
         const { currentUser }  = this.state
-        this.setState({ name: currentUser.firstname + " " + currentUser.lastname });
-        this.setState({ requestId: this.props.location.search.split("=")[1] });
-        // this.fetchMessages(this.props.location.search.split("=")[1]);
-        this.fetchConversationsByRequestId(this.props.location.search.split("=")[1]);
+        // this.setState({ name: currentUser.firstname + " " + currentUser.lastname });
+        this.setState({ responseId: this.props.location.search.split("=")[1] });
+        this.fetchMessages(this.props.location.search.split("=")[1]);
+        // this.fetchConversationsByRequestId(this.props.location.search.split("=")[1]);
     }
 
-    fetchMessages = (requestId) => {
-        const url = `${SERVER_API_URL}/api/v1/messages/${requestId}`;
+    fetchMessages = (responseId) => {
+        const url = `${SERVER_API_URL}/api/v1/messages/${responseId}`;
         fetch(url, {
                 method: 'GET',
                 headers: {
@@ -45,10 +46,11 @@ class Conversation extends Component {
             })
             .then(res => res.json())
             .then(
-                (result) => {                    
+                (result) => {  
+                    console.log('fetchMessages result > ', result)                  
                     this.setState({
                         isLoading: false,
-                        messages: result.messages
+                        messages: result
                     });
                 },
                 (error) => {
@@ -118,7 +120,6 @@ class Conversation extends Component {
     }
 
     sendMessage = (formData) => {
-        console.log("")
         const url = `${SERVER_API_URL}/api/v1/messages`;
         fetch(url, {
                 method: 'POST',
@@ -131,10 +132,19 @@ class Conversation extends Component {
             .then(res => res.json())
             .then(
                 (result) => {
+                    console.log("sendMessage result ", result)
+                    result = result.message
+                    let msg = {
+                        id: result.id,
+                        user: {
+                            firstname: result.firstname
+                        },
+                        content: result.content
+                    }
                     this.setState({
                         isLoading: false,
                         message: '',
-                        messages: [ ...this.state.messages, formData ]
+                        messages: [ ...this.state.messages, msg ]
                     });
                 },
                 (error) => {
@@ -150,12 +160,11 @@ class Conversation extends Component {
     submitForm = (e) => {
         if (e.key === 'Enter') {
             let data = {
-                body: this.state.message,
-                name: this.state.name,
-                conversation_id: this.state.conversationId,
+                content: this.state.message,
+                response_id: parseInt(this.state.responseId),
                 user_id: parseInt(this.state.currentUser.id)
             }
-            console.log("submitForm ", this.state.conversationId)
+            console.log("submitForm data > ", data)
             this.sendMessage(data);
         }
         
@@ -175,7 +184,7 @@ class Conversation extends Component {
     render () {
         return(
 
-                <div className="Conversation">
+                <div className="Chat">
                     <div className="container">
 
                         <div className="section-title">
@@ -191,10 +200,10 @@ class Conversation extends Component {
                                         return (
                                         <li key={message.id}>
                                             <div className="name">
-                                            {message.name}
+                                            {message.user.firstname}
                                             </div>
                                             <div className="text">
-                                            {message.body}
+                                            {message.content}
                                             </div>
                                         </li>
                                         )
@@ -227,4 +236,4 @@ class Conversation extends Component {
     };
 }
 
-export default Conversation;
+export default Chat;

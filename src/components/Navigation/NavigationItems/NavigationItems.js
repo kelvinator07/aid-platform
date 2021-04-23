@@ -9,10 +9,10 @@ const navigationItems = (props) => {
     return (
     
         props.currentUser ? <ul className="NavigationItems"> 
-                    <NavigationItem link="/home">Home</NavigationItem>
+                    <NavigationItem navSelected={props.clicked} link="/home">Home</NavigationItem>
                     {/* <NavigationItem link="/profile">Profile</NavigationItem> */}
-                    <NavigationItem link="/inbox" >Inbox</NavigationItem>
-                    <NavigationItem link="/request" >Request</NavigationItem>
+                    <NavigationItem navSelected={props.clicked} link="/inbox" >Inbox</NavigationItem>
+                    <NavigationItem navSelected={props.clicked} link="/request" >Request</NavigationItem>
                     <li className="NavigationItem">
                         <NavLink 
                             to='/signin' 

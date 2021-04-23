@@ -6,7 +6,7 @@ import './NavigationItem.css';
 const navigationItem = ( props ) => (
     <li className="NavigationItem">
         <NavLink 
-            to={props.link} 
+            to={props.link} onClick={props.navSelected}
             >
             {props.children}
         </NavLink>

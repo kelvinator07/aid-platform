@@ -21,7 +21,8 @@ class Inbox extends Component {
             message: "",
             query: "",
             requestId: null,
-            currentUser: getCurrentUser()
+            currentUser: getCurrentUser(),
+            inbox: []
         }
     }
 
@@ -29,10 +30,91 @@ class Inbox extends Component {
     // Get all messages where request id in requests
     componentDidMount() {
         this.fetchMessages(this.state.currentUser.id);
+        // this.fetchConversations(this.state.currentUser.id);
+    }
+
+    fetchRequests = (user_id) => {
+        const url = `${SERVER_API_URL}/api/v1/requests/user/${user_id}`;
+        fetch(url, {
+                method: 'GET',
+                headers: {
+                    'Content-Type': 'application/json',
+                    Authorization: `Bearer ${localStorage.getItem("token")}`
+                }
+            })
+            .then(res => res.json())
+            .then(
+                (result) => {
+                    const sortedRequests = result.requests.slice().sort((a, b) => a.created_at > b.created_at ? -1 : 1)
+                    this.setState({
+                        isLoading: false,
+                        requests: sortedRequests
+                    });
+                },
+                (error) => {
+                    console.log('Error > ', error)
+                    this.setState({
+                        isLoading: false,
+                        error
+                    });
+                }
+            )
     }
 
     fetchMessages = (user_id) => {
-        const url = `${SERVER_API_URL}/api/v1/messagebyuser/${user_id}`;
+        const url = `${SERVER_API_URL}/api/v1/responses`;
+        fetch(url, {
+                method: 'GET',
+                headers: {
+                    'Content-Type': 'application/json',
+                    Authorization: `Bearer ${localStorage.getItem("token")}`
+                }
+            })
+            .then(res => res.json())
+            .then(
+                (result) => { 
+                    console.log('fetchMessages > ', result)
+
+                    let inbox = []
+                    result.responses.forEach(obj => {
+                        let fina =  {
+                            request_id: obj.request_id,
+                            response_id: obj.id,
+                            request_description: obj.request.description,
+                            messages: obj.messages
+                        }
+                        inbox.push(fina)
+                     })
+
+                     result.requests.forEach(obj => {
+                        let fina =  {
+                            request_id: obj.id,
+                            response_id: obj.messages[0].response_id,
+                            request_description: obj.description,
+                            messages: obj.messages
+                        }
+                        inbox.push(fina)
+                     })
+
+                    console.log('inbox > ', inbox)
+
+                    this.setState({
+                        isLoading: false,
+                        inbox: inbox
+                    });
+                },
+                (error) => {
+                    console.log('Error > ', error)
+                    this.setState({
+                        isLoading: false,
+                        error
+                    });
+                }
+            )
+    }
+
+    fetchConversations = (conversationId) => {
+        const url = `${SERVER_API_URL}/api/v1/conversations/${conversationId}`;
         fetch(url, {
                 method: 'GET',
                 headers: {
@@ -87,17 +169,17 @@ class Inbox extends Component {
 
                             <div  className="card mb-auto">
                                     <ul className="list-group list-group-flush message-list flex-container column">                 
-                                        {this.state.messages.map(message => {
+                                        {this.state.inbox.map(message => {
                                         return (
-                                        <NavLink 
-                                                to={`/conversation?requestid=${message.request_id}`} >
-                                                <li className="list-group-item" key={message.id}>
+                                        <NavLink key={message.request_id}
+                                                to={`/chat?response_id=${message.messages[0].response_id}`} >
+                                                <li className="list-group-item" key={message.request_id}>
                                                     
                                                     <div className="name">
-                                                    {message.name}
+                                                    {message.request_description}
                                                     </div>
                                                     <div className="text">
-                                                    {message.body}
+                                                    {message.messages[0].content}
                                                     </div>
                                                 </li>
                                         </NavLink>

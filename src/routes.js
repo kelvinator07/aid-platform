@@ -5,6 +5,7 @@ import SignUp from "./containers/SignUp/SignUp";
 import Conversation from "./containers/Conversation/Conversation";
 import Inbox from "./containers/Inbox/Inbox";
 import Profile from "./containers/Profile/Profile";
+import Chat from "./containers/Chat/Chat";
 
 const routes = [
   {
@@ -42,6 +43,12 @@ const routes = [
     name: "Inbox",
     icon: "",
     component: Inbox
+  },
+  {
+    path: "/chat",
+    name: "Chat",
+    icon: "",
+    component: Chat
   },
   {
     path: "/profile",

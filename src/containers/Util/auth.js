@@ -5,8 +5,10 @@ const setTokenToLocalStorage = (token) => {
 }
 
 const saveUserToLocalStorage = (data) => {
-    localStorage.setItem("name", data.firstname);
-    localStorage.setItem("user", JSON.stringify(data));
+    let user = data.attributes;
+    user.id = data.id;
+    localStorage.setItem("name", user.firstname);
+    localStorage.setItem("user", JSON.stringify(user));
 }
 
 const getCurrentUser = () => {
@@ -20,6 +22,7 @@ const removeTokenFromLocalStorage = () => {
 const signoutUser = () => {
     localStorage.removeItem("token");
     localStorage.removeItem("user");
+    localStorage.removeItem("name");
 }
 
 export { setTokenToLocalStorage, removeTokenFromLocalStorage, saveUserToLocalStorage, getCurrentUser, signoutUser } ;

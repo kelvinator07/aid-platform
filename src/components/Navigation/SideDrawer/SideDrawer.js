@@ -27,7 +27,7 @@ const sideDrawer = ( props ) => {
                     <Logo />
                 </div>
                 <nav>
-                    <NavigationItems clicked={props.drawerToggleClicked}/>
+                    <NavigationItems currentUser={props.currentUser} clicked={props.drawerToggleClicked}/>
                 </nav>
             </div>
         </>

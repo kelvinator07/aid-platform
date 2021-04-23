@@ -86,7 +86,6 @@ class SignIn extends Component {
         for (let formElementId in this.state.formControls) {
             formData[formElementId] = this.state.formControls[formElementId].value;
         }
-        
         this.submitFormToApi(formData);
     }
 
@@ -98,20 +97,30 @@ class SignIn extends Component {
             headers: {
                 'Content-Type': 'application/json',
             },
-            body: JSON.stringify(formData),
+            body: JSON.stringify({ user: formData }),
             })
-            .then(response => response.json())
+            .then(response => {
+                if (response.ok) {
+                    const auth = response.headers.get('authorization')
+                    if (auth) setTokenToLocalStorage(auth.split(' ')[1]);
+                    // saveUserToLocalStorage(data.data.user);
+                    return response.json();
+                } else {
+                    let error = new Error(response.statusText);
+                    error.response = response;
+                    throw error;
+                }
+            })
             .then(data => {
+                // debugger;
                 this.setState({ isLoading: false })
-                if (data.status === "00") {
-                    this.setState({ formControls: this.initialFormState(), formIsValid: false, formSuccess: true, formMessage: data.message })
-                    setTokenToLocalStorage(data.data.token);
-                    saveUserToLocalStorage(data.data.user);
+                if (data.data) {
+                    this.setState({ formControls: this.initialFormState(), formIsValid: false, formSuccess: true, formMessage: data.data.links.self })
+                    saveUserToLocalStorage(data.data);
                     window.location.reload();
                     this.props.history.push('/home');
-                    // window.location.reload();
                 } else {
-                    this.setState({ formIsValid: false, formFailure: true, formMessage: data.message })
+                    this.setState({ formIsValid: false, formFailure: true, formMessage: data.error })
                 }
                 
             })
@@ -121,6 +130,14 @@ class SignIn extends Component {
                 console.error('Error:', error);
             });
     }
+
+    // sub = (formData) => {
+    //     const url = `${SERVER_API_URL}/api/v1/login`
+    //     axios.post(url, {user:formData})
+    //         .then(response => {
+    //             console.log(response);
+    //         })
+    // }
     
      render() {
 

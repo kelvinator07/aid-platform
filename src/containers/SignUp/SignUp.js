@@ -125,12 +125,15 @@ class SignUp extends Component {
         //     let upload_file = photoInput.files[0]
         //     formData.append("picture", this.state.file);            
         // }
+
         let file = this.myRef.current.files[0];
+        // debugger;
         formData.append("picture", file);
-        // console.log('myRef ', this.myRef.current.files[0])
-        // for(var pair of formData.entries()) {
-        //     console.log(pair[0]+ ', '+ pair[1]); 
-        // }
+
+        console.log('myRef ', this.myRef.current.files[0])
+        for(var pair of formData.entries()) {
+            console.log(pair[0]+ ', '+ pair[1]); 
+        }
         // console.log('formData ', formData)
         this.submitFormToApi(formData);
 
@@ -163,10 +166,11 @@ class SignUp extends Component {
             .then(response => response.json())
             .then(data => {
                 this.setState({ isLoading: false })
-                if (data.status === "00") {
-                    this.setState({ formControls: this.initialFormState(), formIsValid: false, formSuccess: true, formMessage: 'Registration Sucsessful.' })
+
+                if (data.data) {
+                    this.setState({ formControls: this.initialFormState(), formIsValid: false, formSuccess: true, formMessage: 'Registration Successful.' })
                 } else {
-                    this.setState({ formIsValid: false, formFailure: true, formMessage: data.message })
+                    this.setState({ formIsValid: false, formFailure: true, formMessage: data.error })
                 }
             })
             .catch((error) => {
