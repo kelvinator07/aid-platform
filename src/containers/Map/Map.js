@@ -39,13 +39,13 @@ const handleClick = (value) => {
   
 const Map = (props) => {
   console.log("Props location ", props.location);
-  // [6.432, 3.525]
+  //[6.432, 3.525] [6.56, 3.346]
   return (
-    <MapContainer center={[6.432, 3.525]} zoom={13} scrollWheelZoom={false} style={{ height: '500px' }}>
+    <MapContainer center={props.location} zoom={13} scrollWheelZoom={false} style={{ height: '500px' }}>
       <TileLayer
         attribution='&copy; <a href="http://osm.org/copyright">OpenStreetMap</a> contributors'
         url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png" />
-      <Circle center={[6.432, 3.525]} pathOptions={fillGreenOptions} radius={200} >
+      <Circle center={props.location} pathOptions={fillGreenOptions} radius={200} >
         <Popup>
           You Are Here
         </Popup>

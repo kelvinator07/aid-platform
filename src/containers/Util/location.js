@@ -4,7 +4,6 @@ const getLocation = () => {
     } else { 
         alert("Geolocation is not supported by this browser.");
     }
-    console.log("loca", loca);
     return loca;
 }
   

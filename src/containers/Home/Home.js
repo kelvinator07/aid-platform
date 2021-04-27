@@ -23,20 +23,16 @@ class Home extends Component {
             places: [],
             request: {},
             requestSelected: false,
-            location: null,
+            location: [],
             conversationId: null,
             responseId:null,
-            currentUser: getCurrentUser(),
-            local: getLocation()
+            currentUser: getCurrentUser()
         }
     }
 
     componentDidMount() {
         this.fetchRequests();
-        const loc = getLocation();
-        console.log("local ", this.state.local)
-        this.setState({ location : this.state.local })
-        console.log("Props home > ", this.props)
+        this.setState({ location : getLocation() })
     }
 
     fetchRequests = () => {
@@ -121,7 +117,6 @@ class Home extends Component {
             .then(res => res.json())
             .then(
                 (result) => {   
-                    console.log("volunteer res > ", result);                 
                     this.setState({
                         isLoading: false
                     });
@@ -150,7 +145,6 @@ class Home extends Component {
             .then(res => res.json())
             .then(
                 (result) => {   
-                    console.log("conversation res > ", result);                 
                     this.setState({
                         conversationId: result.id,
                         isLoading: false
@@ -226,19 +220,6 @@ class Home extends Component {
             } catch(e) {
                 console.log(e);
             }
-
-            console.log("this.state.responseId ", this.state.responseId)
-            
-
-                // <Link to="/home">
-                // <Button color="inherit">Home</Button>
-                // </Link>
-                // <Link to="/my-account">
-                // <Button color="inherit">My Account</Button>
-                // </Link>
-                // <Button color="inherit" onClick={this.props.logout}>
-                // Logout
-                // </Button>
     }
 
     createResponse = async () => {
@@ -261,25 +242,6 @@ class Home extends Component {
             
     }
 
-    // .then(res => res.json())
-    //         .then(
-    //             (result) => {   
-    //                 console.log("handleResponse res > ", result.data.id);                 
-    //                 this.setState({
-    //                     isLoading: false,
-    //                     responseId:result.data.id
-    //                 });
-                   
-    //             },
-    //             (error) => {
-    //                 console.log('Error > ', error)
-    //                 this.setState({
-    //                     isLoading: false,
-    //                     error
-    //                 });
-    //             }
-    //         )
-
     render () {
         return(
             <div className="Home">
@@ -287,7 +249,7 @@ class Home extends Component {
                     <div>
                          <h1>Unfufilled Requests: {this.state.requests.length}</h1>
                     </div>
-                    { this.state.location &&
+                    { this.state.location.length > 1 &&
                     <Map location={this.state.location} requests={this.state.requests} clicked={this.requestHandler} />
                      }
                     {/* <Modal show={this.state.requestSelected} modalClosed={this.requestCancel}>

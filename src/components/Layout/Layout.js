@@ -15,7 +15,6 @@ class Layout extends Component {
 
     componentDidMount =() => {
         this.setState( { currentUser: getCurrentUser() } );
-        console.log("Props Layout > ", this.props)
     }
 
     state = {

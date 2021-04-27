@@ -30,7 +30,6 @@ class Inbox extends Component {
     // Get all messages where request id in requests
     componentDidMount() {
         this.fetchMessages(this.state.currentUser.id);
-        // this.fetchConversations(this.state.currentUser.id);
     }
 
     fetchRequests = (user_id) => {
@@ -72,9 +71,7 @@ class Inbox extends Component {
             })
             .then(res => res.json())
             .then(
-                (result) => { 
-                    console.log('fetchMessages > ', result)
-
+                (result) => {
                     let inbox = []
                     result.responses.forEach(obj => {
                         let fina =  {
@@ -95,8 +92,6 @@ class Inbox extends Component {
                         }
                         inbox.push(fina)
                      })
-
-                    console.log('inbox > ', inbox)
 
                     this.setState({
                         isLoading: false,

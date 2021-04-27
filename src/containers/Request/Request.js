@@ -1,7 +1,6 @@
 import React, { Component } from 'react';
 import './Request.css';
 import TextInput from '../../components/UI/TextInput/TextInput';
-import Button from '../../components/UI/Button/Button';
 import SelectInput from '../../components/UI/SelectInput/SelectInput';
 import validate from '../Util/validate';
 import Loader from '../../components/UI/Loader/Loader';
@@ -9,6 +8,7 @@ import { getCurrentUser } from '../../containers/Util/auth';
 import Tabs from "../../components/Tabs/Tabs"; 
 import moment from 'moment'
 import { SERVER_API_URL } from '../../constants'
+import getLocation from '../Util/location';
 
 
 //Makes sure location accuracy is high
@@ -61,7 +61,7 @@ class Request extends Component {
             },
             lat: {
                 value: '',
-                valid: true,
+                valid: false,
                 validationRules: {
                     isRequiredNumber: true
                 },
@@ -70,7 +70,7 @@ class Request extends Component {
             },
             lng: {
                 value: '',
-                valid: true,
+                valid: false,
                 validationRules: {
                     isRequiredNumber: true
                 },
@@ -89,6 +89,8 @@ class Request extends Component {
     }
       
     updatePosition = position => {
+        const loc  = getLocation()
+
         const updatedControls = {
             ...this.state.formControls
         };
@@ -190,16 +192,6 @@ class Request extends Component {
     }
 
     handleUpdate = (request) => {
-        // const target = event.target;
-        // var value = target.value;
-        
-        // if(target.checked){
-        //     // this.state.hobbies[value] = value;   
-        //     console.log("value ", value)
-        // }else{
-        //     // this.state.hobbies.splice(value, 1);
-        //     console.log("value else ", value)
-        // }
         let req = { ...request }
         req.fulfilled = !req.fulfilled
         this.updateRequest(req);
@@ -220,9 +212,8 @@ class Request extends Component {
                 (result) => {                    
                     this.setState({
                         isLoading: false,
-                        request: result.data,
-                        disabled: !this.state.disabled
                     });
+                    this.props.history.push('/home');
                 },
                 (error) => {
                     console.log('Error > ', error)
@@ -255,7 +246,6 @@ class Request extends Component {
         updatedFormElement.value = value;
         // updatedFormElement.touched = true;
         updatedFormElement.valid = validate(value, updatedFormElement.validationRules);
-        // debugger;
 
         updatedControls[name] = updatedFormElement;
 
@@ -268,8 +258,6 @@ class Request extends Component {
             formControls: updatedControls,
             formIsValid: formIsValid
         });
-
-        // console.log(this.state.formControls)
     }
 
     onSubmitForm = (event) => {
@@ -385,13 +373,11 @@ class Request extends Component {
                                                     <div className="form-group">
                                                     <button className="btn btn-primary mx-4" type="button" onClick={this.getLocation}>Get My Location</button>
                                                     </div>
-                                                    {/* <Button type="button" btnType="Primary" clicked={this.getLocation}>Get Location</Button> */}
                                             </div>
                                             
                                         </div>
 
-                                        {/* <input type="btn btn-primary" value="submit" onClick={this.onSubmitForm} /> disabled={!this.state.formIsValid} */}
-                                        <button className="btn btn-primary" onClick={this.onSubmitForm}  > Submit Request </button>
+                                        <button className="btn btn-primary" onClick={this.onSubmitForm} disabled={!this.state.formIsValid} > Submit Request </button>
                                     
 
                                     </form> 
@@ -406,7 +392,7 @@ class Request extends Component {
                                                 <th scope="col">#</th>
                                                 <th scope="col">Description</th>
                                                 {/* <th scope="col">Fulfilled</th> */}
-                                                {/* <th scope="col">Fulfilcount</th> */}
+                                                <th scope="col">Responses Count</th>
                                                 <th scope="col">Request Type</th>
                                                 <th scope="col">Date</th>
                                                 <th scope="col">Mark As Fufilled</th>
@@ -420,7 +406,7 @@ class Request extends Component {
                                                         <th scope="row">{key+1}</th>
                                                         <td>{value.description}</td>
                                                         {/* <td>{value.fulfilled ? "True" : "False"}</td> */}
-                                                        {/* <td>{value.fulfilcount}</td> */}
+                                                        <td>{value.responses_count}</td>
                                                         <td>{value.request_type.replace("_"," ")}</td>
                                                         <td>{moment(value.created_at).format('MM/DD/YYYY')}</td>
                                                         <td>

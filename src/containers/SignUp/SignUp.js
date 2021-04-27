@@ -2,8 +2,6 @@ import React, { Component } from 'react';
 import './SignUp.css';
 import TextInput from '../../components/UI/TextInput/TextInput';
 import EmailInput from '../../components/UI/EmailInput/EmailInput';
-import ImageInput from '../../components/UI/ImageInput/ImageInput';
-
 import validate from '../Util/validate';
 import Loader from '../../components/UI/Loader/Loader';
 import { SERVER_API_URL } from '../../constants'
@@ -67,6 +65,14 @@ class SignUp extends Component {
                 },
                 placeholderText: 'Enter Email Address',
                 touched: false
+            },
+            picture: {
+                value: '',
+                valid: false,
+                validationRules: {
+                    isRequired: true
+                },
+                touched: false
             }
         }
     }
@@ -98,7 +104,6 @@ class SignUp extends Component {
             formIsValid: formIsValid
         });
 
-        // console.log(this.state.formControls)
     }
 
     imageValueHandler = (event) => {
@@ -107,7 +112,15 @@ class SignUp extends Component {
 
     imageHandler = event => {
         this.imageValueHandler(event);
-        // this.changeHandler(event);
+    }
+
+    onFileClicked = () => {
+        let file = this.myRef.current.files[0];
+        if (file) {
+            this.setState({
+                formIsValid: true
+            });
+        }
     }
 
     onSubmitForm = (event) => {
@@ -120,21 +133,12 @@ class SignUp extends Component {
             formData.append(formElementId, this.state.formControls[formElementId].value);
         }
 
-        // let photoInput = document.getElementById('picture');
-        // if (photoInput.files[0]) {
-        //     let upload_file = photoInput.files[0]
-        //     formData.append("picture", this.state.file);            
-        // }
-
         let file = this.myRef.current.files[0];
-        // debugger;
         formData.append("picture", file);
 
-        console.log('myRef ', this.myRef.current.files[0])
         for(var pair of formData.entries()) {
             console.log(pair[0]+ ', '+ pair[1]); 
         }
-        // console.log('formData ', formData)
         this.submitFormToApi(formData);
 
     }
@@ -254,15 +258,8 @@ class SignUp extends Component {
 
                                     <div className="form-group">
                                         <label htmlFor="picture">Picture:</label>
-                                        <input type="file" ref={this.myRef}  name="picture"
+                                        <input type="file" ref={this.myRef}  name="picture" onChange={this.onFileClicked}
                                         accept="image/png, image/jpeg, image/pdf" className="form-control-file" />
-
-                                        {/* <ImageInput name="picture" 
-                                            ref={this.myRef}
-                                            placeholder="Choose a pic"
-                                            // onChange={this.changeHandler}
-                                            // onChange={(e)=>this._handleImageChange(e)}
-                                            /> */}
                                     </div>
 
                                     <button className="btn btn-primary" onClick={this.onSubmitForm} disabled={!this.state.formIsValid} > Sign Up </button>
