@@ -61,19 +61,11 @@ class Request extends Component {
             },
             lat: {
                 value: '',
-                valid: false,
-                validationRules: {
-                    isRequiredNumber: true
-                },
                 placeholderText: 'Latitude',
                 touched: false
             },
             lng: {
                 value: '',
-                valid: false,
-                validationRules: {
-                    isRequiredNumber: true
-                },
                 placeholderText: 'Longitude',
                 touched: false
             }
@@ -253,7 +245,7 @@ class Request extends Component {
         for (let inputIdentifier in updatedControls) {
             formIsValid = updatedControls[inputIdentifier].valid && formIsValid;
         }
-
+        console.log("formIsValid ", formIsValid)
         this.setState({
             formControls: updatedControls,
             formIsValid: formIsValid
