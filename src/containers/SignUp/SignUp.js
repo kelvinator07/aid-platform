@@ -128,9 +128,6 @@ class SignUp extends Component {
         let file = this.myRef.current.files[0];
         formData.append("picture", file);
 
-        for(var pair of formData.entries()) {
-            console.log(pair[0]+ ', '+ pair[1]); 
-        }
         this.submitFormToApi(formData);
 
     }
