@@ -99,8 +99,6 @@ class Request extends Component {
             formControls: updatedControls,
             formIsValid: formIsValid
         })
-
-        console.log(`Current Latitude is ${position.coords.latitude} and your longitude is ${position.coords.longitude}`);
     }
 
     showError = error => {
@@ -238,7 +236,6 @@ class Request extends Component {
         for (let inputIdentifier in updatedControls) {
             formIsValid = updatedControls[inputIdentifier].valid && formIsValid;
         }
-        console.log("formIsValid ", formIsValid)
         this.setState({
             formControls: updatedControls,
             formIsValid: formIsValid
@@ -253,7 +250,6 @@ class Request extends Component {
             formData[formElementId] = this.state.formControls[formElementId].value;
         }
         
-        console.dir(formData);
         this.submitFormToApi(formData);
     }
 

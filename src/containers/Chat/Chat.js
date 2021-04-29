@@ -40,7 +40,6 @@ class Chat extends Component {
             .then(res => res.json())
             .then(
                 (result) => {  
-                    console.log('fetchMessages result > ', result)                  
                     this.setState({
                         isLoading: false,
                         messages: result
@@ -83,34 +82,6 @@ class Chat extends Component {
             )
     }
 
-    fetchConversationsByRequestId = (requestId) => {
-        const url = `${SERVER_API_URL}/api/v1/conversations/requestid/${requestId}`;
-        fetch(url, {
-                method: 'GET',
-                headers: {
-                    'Content-Type': 'application/json',
-                    Authorization: `Bearer ${localStorage.getItem("token")}`
-                }
-            })
-            .then(res => res.json())
-            .then(
-                (result) => {      
-                    console.log("fetchConversationsByRequestId ", result)              
-                    this.setState({
-                        conversationId: result.data.id,
-                        isLoading: false,
-                    });
-                },
-                (error) => {
-                    console.log('Error > ', error)
-                    this.setState({
-                        isLoading: false,
-                        error
-                    });
-                }
-            )
-    }
-
     sendMessage = (formData) => {
         const url = `${SERVER_API_URL}/api/v1/messages`;
         fetch(url, {
@@ -124,7 +95,6 @@ class Chat extends Component {
             .then(res => res.json())
             .then(
                 (result) => {
-                    console.log("sendMessage result ", result)
                     result = result.message
                     let msg = {
                         id: result.id,
@@ -156,7 +126,6 @@ class Chat extends Component {
                 response_id: parseInt(this.state.responseId),
                 user_id: parseInt(this.state.currentUser.id)
             }
-            console.log("submitForm data > ", data)
             this.sendMessage(data);
         }
         
