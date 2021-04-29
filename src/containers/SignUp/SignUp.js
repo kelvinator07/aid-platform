@@ -106,14 +106,6 @@ class SignUp extends Component {
 
     }
 
-    imageValueHandler = (event) => {
-        console.log("imageValueHandler ", event)
-    }
-
-    imageHandler = event => {
-        this.imageValueHandler(event);
-    }
-
     onFileClicked = () => {
         let file = this.myRef.current.files[0];
         if (file) {
@@ -142,24 +134,7 @@ class SignUp extends Component {
         this.submitFormToApi(formData);
 
     }
-
-    _handleImageChange(e) {
-        e.preventDefault();
     
-        let reader = new FileReader();
-        let file = e.target.files[0];
-    
-        reader.onloadend = () => {
-            console.log("file ", file);
-          this.setState({
-            file: file,
-            // imagePreviewUrl: reader.result
-          });
-        }
-    
-        reader.readAsDataURL(file)
-      }
-
     submitFormToApi = (formData) => {
         const url = `${SERVER_API_URL}/api/v1/signup`
         

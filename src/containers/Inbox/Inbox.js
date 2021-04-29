@@ -1,8 +1,7 @@
 import React, { Component } from "react";
 import './Inbox.css';
-import TextInput from '../../components/UI/TextInput/TextInput';
 import { getCurrentUser } from '../../containers/Util/auth';
-import { NavLink, Link } from "react-router-dom";
+import { NavLink } from "react-router-dom";
 import { SERVER_API_URL } from '../../constants'
 
 
@@ -26,8 +25,6 @@ class Inbox extends Component {
         }
     }
 
-    // Get all requests by user id
-    // Get all messages where request id in requests
     componentDidMount() {
         this.fetchMessages(this.state.currentUser.id);
     }
@@ -181,30 +178,7 @@ class Inbox extends Component {
                                         )
                                     })}
                                     </ul>
-                                    {/* <Link to={`/conversation?requestid=${props.request.id}`} ><Button btnType="Success"> VOLUNTEER </Button></Link> */}
-
-                                    {/* <div className="list-group">
-                                            {this.state.messages.map(message => {
-                                                return (
-                                                    <li className="list-group-item" key={message.id}>
-<Link 
-                                                    to={`/conversation?requestid=${message.request_id}`} >
-                                                        <div className="name">
-                                                        {message.name}
-                                                        </div>
-                                                        <div className="text">
-                                                        {message.body}
-                                                        </div>
-                                                </Link>
-
-                                                    </li>
-                                                    
-                                                )
-                                            })}
-                                       
-                                        {/* <a href="#" className="list-group-item list-group-item-action disabled">Vestibulum at eros</a> */}
-                                    {/* </div> */}
-
+                                    
                             </div>
                             </div>
                         </div>

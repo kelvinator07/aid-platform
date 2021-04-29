@@ -1,7 +1,6 @@
 import 'leaflet/dist/leaflet.css'
 import './Map.css'
 import markerIcon from 'leaflet/dist/images/marker-icon.png'
-import markerIconRed from '../../assets/images/pin.png'
 
 import { MapContainer, TileLayer, Marker, Circle, Popup } from 'react-leaflet'
 import L from 'leaflet'
@@ -22,24 +21,9 @@ const redIcon = L.icon({
     shadowAnchor: [22, 94]
   })
 
-  const circle = (location) => L.circle(location, {
-    color: 'red',
-    fillColor: '#f03',
-    fillOpacity: 0.5,
-    radius: 500
-  });
-
   const fillGreenOptions = { color: '#008000', fillColor: 'green', fillOpacity: 0.5 }
 
-const handleClick = (value) => {
-  // const { lat, lng } = event.latlng
-  alert(`marker clicked ${value}`)
-}
-
-  
 const Map = (props) => {
-  console.log("Props location ", props.location);
-  //[6.432, 3.525] [6.56, 3.346]
   return (
     <MapContainer center={props.location} zoom={13} scrollWheelZoom={false} style={{ height: '500px' }}>
       <TileLayer

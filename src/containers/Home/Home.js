@@ -1,16 +1,11 @@
 import React, { Component } from "react";
-import { Redirect, NavLink } from 'react-router-dom';
 import './Home.css';
 import Map from "../Map/Map";
 import ModalReact from '../../components/UI/ModalReact/ModalReact';
 import RequestDetails from '../RequestDetails/RequestDetails';
 import getLocation from '../Util/location';
-import authHeader from '../Util/auth-header';
 import { SERVER_API_URL } from '../../constants'
 import { getCurrentUser } from '../../containers/Util/auth';
-
-import { createConsumer } from '@rails/actioncable';
-const Consumer = createConsumer('ws://localhost:5000/cable');
 
 class Home extends Component {
 
@@ -48,11 +43,6 @@ class Home extends Component {
             .then(
                 (result) => {
                     if (result.total > 0) {
-                        // const oneDay = 60 * 60 * 24 * 1000;
-                        // const filt = result.requests.filter(res => res.fulfilled == false 
-                        //     || (res.fulfilled == false && res.fulfilcount < 5) 
-                        //     || (res.fulfilcount >= 5 && (Date.parse(new Date()) - Date.parse(res.updated_at)) < oneDay));
-                        // console.log("1 ", filt)
                          let newObject = result.requests.map(obj => {
                             let fina =  {}
                             fina = { ...obj, latlng:[] }
@@ -63,7 +53,6 @@ class Home extends Component {
                     }
                     this.setState({
                         isLoading: false,
-                        // request: result.data
                     });
                 },
                 (error) => {
@@ -176,7 +165,6 @@ class Home extends Component {
 
     handleClick() {
         this.props.history.push('/conversation');
-        // onClick={() => this.handleClick()}
       }
 
     requestCancel = () => {
@@ -185,7 +173,6 @@ class Home extends Component {
 
     handleVolunteer = () => {
         let request = { ...this.state.request }
-        // create a conversation
         let conversation = {
             recipient_id: request.user_id,
             sender_id: this.state.currentUser.id,
@@ -193,7 +180,6 @@ class Home extends Component {
         }
         this.createConversation(conversation);
 
-        // create a volunteer
         let volunteer = {
             user_id: this.state.currentUser.id,
             request_id: request.id
@@ -252,9 +238,6 @@ class Home extends Component {
                     { this.state.location.length > 1 &&
                     <Map location={this.state.location} requests={this.state.requests} clicked={this.requestHandler} />
                      }
-                    {/* <Modal show={this.state.requestSelected} modalClosed={this.requestCancel}>
-                        <RequestDetails  request={this.state.request} />
-                    </Modal> */}
 
                     <ModalReact show={this.state.requestSelected} modalClosed={this.requestCancel}
                      open={this.state.requestSelected}

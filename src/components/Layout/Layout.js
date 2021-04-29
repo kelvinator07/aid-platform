@@ -9,10 +9,6 @@ import { getCurrentUser, signoutUser } from '../../containers/Util/auth';
 
 class Layout extends Component {
 
-    constructor () {
-        super()
-    }
-
     componentDidMount =() => {
         this.setState( { currentUser: getCurrentUser() } );
     }

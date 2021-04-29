@@ -74,8 +74,6 @@ class SignIn extends Component {
             formControls: updatedControls,
             formIsValid: formIsValid
         });
-
-        // console.log(this.state.formControls)
     }
 
     onSubmitForm = (event) => {
@@ -103,7 +101,6 @@ class SignIn extends Component {
                 if (response.ok) {
                     const auth = response.headers.get('authorization')
                     if (auth) setTokenToLocalStorage(auth.split(' ')[1]);
-                    // saveUserToLocalStorage(data.data.user);
                     return response.json();
                 } else {
                     let error = new Error(response.statusText);
@@ -112,7 +109,6 @@ class SignIn extends Component {
                 }
             })
             .then(data => {
-                // debugger;
                 this.setState({ isLoading: false })
                 if (data.data) {
                     this.setState({ formControls: this.initialFormState(), formIsValid: false, formSuccess: true, formMessage: data.data.links.self })
@@ -130,14 +126,6 @@ class SignIn extends Component {
                 console.error('Error:', error);
             });
     }
-
-    // sub = (formData) => {
-    //     const url = `${SERVER_API_URL}/api/v1/login`
-    //     axios.post(url, {user:formData})
-    //         .then(response => {
-    //             console.log(response);
-    //         })
-    // }
     
      render() {
 
@@ -187,10 +175,7 @@ class SignIn extends Component {
                                             />
                                     </div>
 
-                                    {/* <input type="btn btn-primary" value="submit" onClick={this.onSubmitForm} /> */}
                                     <button className="btn btn-primary" onClick={this.onSubmitForm} disabled={!this.state.formIsValid} > Log In </button>
-                                    
-
                                 </form> 
 
                             </div>

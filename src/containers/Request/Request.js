@@ -8,7 +8,6 @@ import { getCurrentUser } from '../../containers/Util/auth';
 import Tabs from "../../components/Tabs/Tabs"; 
 import moment from 'moment'
 import { SERVER_API_URL } from '../../constants'
-import getLocation from '../Util/location';
 
 
 //Makes sure location accuracy is high
@@ -39,7 +38,7 @@ class Request extends Component {
     componentDidMount() {
         this.fetchRequests(this.state.currentUser.id);
     }
-    // selected
+    
     initialFormState() {
         return {
             description: {
@@ -81,8 +80,6 @@ class Request extends Component {
     }
       
     updatePosition = position => {
-        const loc  = getLocation()
-
         const updatedControls = {
             ...this.state.formControls
         };
@@ -93,7 +90,6 @@ class Request extends Component {
         updatedControls.lat.valid = validate(position.coords.latitude, updatedControls.lat.validationRules);
         updatedControls.lng.valid = validate(position.coords.longitude, updatedControls.lng.validationRules);
 
-        // debugger;
         let formIsValid = true;
         for (let inputIdentifier in updatedControls) {
             formIsValid = updatedControls[inputIdentifier].valid && formIsValid;
@@ -107,9 +103,7 @@ class Request extends Component {
         console.log(`Current Latitude is ${position.coords.latitude} and your longitude is ${position.coords.longitude}`);
     }
 
-    // Displays the different error messages
     showError = error => {
-        //mapArea.style.display = "block"
         switch (error.code) {
         case error.PERMISSION_DENIED:
             alert("You denied the request for your location.");
@@ -236,7 +230,6 @@ class Request extends Component {
         if (Number(value) === value && value % 1 !== 0) value = value.toFixed(2);
 
         updatedFormElement.value = value;
-        // updatedFormElement.touched = true;
         updatedFormElement.valid = validate(value, updatedFormElement.validationRules);
 
         updatedControls[name] = updatedFormElement;
@@ -350,7 +343,6 @@ class Request extends Component {
                                                     onChange={this.changeHandler}
                                                     touched={this.state.formControls.lat.touched}
                                                     valid={this.state.formControls.lat.valid}
-                                                    // disabled
                                                     />
 
                                                     <TextInput name="lng" type="number" className="form-control ml-3"
@@ -359,7 +351,6 @@ class Request extends Component {
                                                     onChange={this.changeHandler}
                                                     touched={this.state.formControls.lng.touched}
                                                     valid={this.state.formControls.lng.valid}
-                                                    // disabled
                                                     />
 
                                                     <div className="form-group">
@@ -383,11 +374,10 @@ class Request extends Component {
                                             <tr>
                                                 <th scope="col">#</th>
                                                 <th scope="col">Description</th>
-                                                {/* <th scope="col">Fulfilled</th> */}
-                                                <th scope="col">Responses Count</th>
                                                 <th scope="col">Request Type</th>
                                                 <th scope="col">Date</th>
                                                 <th scope="col">Mark As Fufilled</th>
+                                                <th scope="col">Responses Count</th>
                                                 <th scope="col">Republish</th>
                                             </tr>
                                         </thead>
@@ -397,8 +387,6 @@ class Request extends Component {
                                                     <tr key={value.id}>
                                                         <th scope="row">{key+1}</th>
                                                         <td>{value.description}</td>
-                                                        {/* <td>{value.fulfilled ? "True" : "False"}</td> */}
-                                                        <td>{value.responses_count}</td>
                                                         <td>{value.request_type.replace("_"," ")}</td>
                                                         <td>{moment(value.created_at).format('MM/DD/YYYY')}</td>
                                                         <td>
@@ -413,8 +401,9 @@ class Request extends Component {
                                                             onClick={() => this.handleUpdate(value)} />
                                                         </div>
                                                         </td>
+                                                        <td>{value.responses_count}</td>
                                                         <td onClick={() => this.handleRepublish(value.id)}>
-                                                            <button className="btn btn-primary"> Click </button>
+                                                            <button disabled={!value.fulfilled && value.is_republishable ? false : true} className="btn btn-primary"> Click </button>
                                                         </td>
                                                     </tr>
                                                 );

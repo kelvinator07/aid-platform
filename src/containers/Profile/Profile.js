@@ -16,14 +16,7 @@ class Profile extends Component {
         }
     }
 
-    // Get all requests by user id
-    // Get all messages where request id in requests
     componentDidMount() {
-        // this.fetchMessages();
-        // this.setState({ requestId: this.props.location.search.split("=")[1] });
-        // console.log("requestId ", this.props.location.search.split("=")[1]);
-        // this.setState( { currentUser: getCurrentUser() } );
-
     }
 
 
@@ -121,7 +114,6 @@ class Profile extends Component {
                                         placeholder="Upload a picture"
                                         value={this.state.picture}
                                         onChange={this.handleChange}
-                                        // onChange={(e)=>this._handleImageChange(e)}
                                         />
                                 </div>
                                 

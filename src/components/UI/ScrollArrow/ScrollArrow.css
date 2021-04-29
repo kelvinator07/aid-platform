@@ -14,8 +14,6 @@
   }
   
   .ScrollArrow span:hover{
-    /* opacity: 1; */
-    /* color: #fff; */
     background: #dff3fc;
   }
   
@@ -31,7 +29,6 @@
   .ScrollArrow span {
     font-size: 20px;
     color: #0499df;
-    /* float: left; */
     width: 44px;
     height: 44px;
     background: #dff3fc;

@@ -10,7 +10,6 @@ const EmailInput = props => {
 
     const prop = { ...props };
     const { valid, ...propNoA } = prop;
-    // console.log(propNoA); // => { b: 2, c: 3 }
 
     return (
         <div className="form-group">

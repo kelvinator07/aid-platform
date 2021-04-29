@@ -23,16 +23,9 @@ class Chat extends Component {
         }
     }
 
-    // Mark as fufilled
-    // Re activate updated_at
-
     componentDidMount() {
-        console.log("Props chat > ", this.props)
-        const { currentUser }  = this.state
-        // this.setState({ name: currentUser.firstname + " " + currentUser.lastname });
         this.setState({ responseId: this.props.location.search.split("=")[1] });
         this.fetchMessages(this.props.location.search.split("=")[1]);
-        // this.fetchConversationsByRequestId(this.props.location.search.split("=")[1]);
     }
 
     fetchMessages = (responseId) => {
@@ -106,7 +99,6 @@ class Chat extends Component {
                     this.setState({
                         conversationId: result.data.id,
                         isLoading: false,
-                        // messages: result.messages
                     });
                 },
                 (error) => {
@@ -172,9 +164,6 @@ class Chat extends Component {
 
     handleSubmit = (e) => {
         e.preventDefault()
-        // console.log("m ", this.state.message)
-        // this.props.sendMessage(this.state.message)
-        // this.setState({ message: ''})
       }
 
     handleChange = (e) => {
