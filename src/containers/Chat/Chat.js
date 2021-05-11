@@ -3,6 +3,9 @@ import './Chat.css';
 import TextInput from '../../components/UI/TextInput/TextInput';
 import { getCurrentUser } from '../../containers/Util/auth';
 import { SERVER_API_URL } from '../../constants'
+// import actioncable from 'actioncable';
+import { createConsumer } from '@rails/actioncable';
+import Cable from 'actioncable';
 
 class Chat extends Component {
 
@@ -21,12 +24,54 @@ class Chat extends Component {
             name: "",
             currentUser: getCurrentUser()
         }
+        this.messageChannel = {}
+        // this.consumer = createConsumer('ws://localhost:5000/cable');
     }
 
-    componentDidMount() {
+    componentWillMount() {
         this.setState({ responseId: this.props.location.search.split("=")[1] });
-        this.fetchMessages(this.props.location.search.split("=")[1]);
+        // this.fetchMessages(this.props.location.search.split("=")[1]);
+
+        this.createSocket();
     }
+      
+    createSocket() {
+        let cable = Cable.createConsumer('ws://localhost:5000/cable');
+        this.chats = cable.subscriptions.create({
+            channel: 'message_channel'
+        //   channel: `response-${this.props.location.search.split("=")[1]}`
+        }, {
+          connected: () => {
+            console.log("Connected")
+          },
+          received: (data) => {
+            console.log(data);
+          },
+          create: function(chatContent) {
+            this.perform('create', {
+              content: chatContent
+            });
+          }
+        });
+      }
+
+    // componentDidMount() {
+        // this.setState({ responseId: this.props.location.search.split("=")[1] });
+        // this.fetchMessages(this.props.location.search.split("=")[1]);
+
+        // this.messageChannel = this.consumer.subscriptions.create(`response-${this.props.location.search.split("=")[1]}`, {
+        //     connected: () => {
+        //         console.log("Connected")
+        //     },
+        //     received: (data) => {
+        //       console.log(data)
+        //     },
+        //     disconnected: () => {
+        //         console.log("disconnected")
+        //     }
+        //   })
+       
+    // }
 
     fetchMessages = (responseId) => {
         const url = `${SERVER_API_URL}/api/v1/messages/${responseId}`;
@@ -140,6 +185,7 @@ class Chat extends Component {
     }
 
     render () {
+        
         return(
 
                 <div className="Chat">
