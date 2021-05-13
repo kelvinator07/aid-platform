@@ -29,34 +29,6 @@ class Inbox extends Component {
         this.fetchMessages(this.state.currentUser.id);
     }
 
-    fetchRequests = (user_id) => {
-        const url = `${SERVER_API_URL}/api/v1/requests/user/${user_id}`;
-        fetch(url, {
-                method: 'GET',
-                headers: {
-                    'Content-Type': 'application/json',
-                    Authorization: `Bearer ${localStorage.getItem("token")}`
-                }
-            })
-            .then(res => res.json())
-            .then(
-                (result) => {
-                    const sortedRequests = result.requests.slice().sort((a, b) => a.created_at > b.created_at ? -1 : 1)
-                    this.setState({
-                        isLoading: false,
-                        requests: sortedRequests
-                    });
-                },
-                (error) => {
-                    console.log('Error > ', error)
-                    this.setState({
-                        isLoading: false,
-                        error
-                    });
-                }
-            )
-    }
-
     fetchMessages = (user_id) => {
         const url = `${SERVER_API_URL}/api/v1/responses`;
         fetch(url, {
@@ -70,26 +42,39 @@ class Inbox extends Component {
             .then(
                 (result) => {
                     let inbox = []
-                    result.responses.forEach(obj => {
+                     let res = [];
+                     result.requests.forEach(req => {
+                        res = req.messages.map(obj => {
+
+                            const container = {};
+
+                            container.id = obj.id;
+                            container.content = obj.content;
+                            container.request_id = obj.request_id;
+                            container.response_id = obj.response_id;
+                            container.request_description = req.description;
+
+                            return container;
+                         })
+                     })
+
+                     const uniqueResponses = Array.from(new Set(res.map(a => a.response_id)))
+                        .map(id => {
+                        return res.find(a => a.response_id === id)
+                        })
+
+                    inbox = [...inbox, ...uniqueResponses]
+                     result.responses.forEach(obj => {
                         let fina =  {
+                            id: obj.id,
+                            content: obj.messages[0].content,
                             request_id: obj.request_id,
                             response_id: obj.id,
-                            request_description: obj.request.description,
-                            messages: obj.messages
+                            request_description: obj.request.description
                         }
                         inbox.push(fina)
                      })
-
-                     result.requests.forEach(obj => {
-                        let fina =  {
-                            request_id: obj.id,
-                            response_id: obj.messages[0].response_id,
-                            request_description: obj.description,
-                            messages: obj.messages
-                        }
-                        inbox.push(fina)
-                     })
-
+                     
                     this.setState({
                         isLoading: false,
                         inbox: inbox
@@ -104,47 +89,6 @@ class Inbox extends Component {
                 }
             )
     }
-
-    fetchConversations = (conversationId) => {
-        const url = `${SERVER_API_URL}/api/v1/conversations/${conversationId}`;
-        fetch(url, {
-                method: 'GET',
-                headers: {
-                    'Content-Type': 'application/json',
-                    Authorization: `Bearer ${localStorage.getItem("token")}`
-                }
-            })
-            .then(res => res.json())
-            .then(
-                (result) => {                    
-                    this.setState({
-                        isLoading: false,
-                        messages: result.messages
-                    });
-                },
-                (error) => {
-                    console.log('Error > ', error)
-                    this.setState({
-                        isLoading: false,
-                        error
-                    });
-                }
-            )
-    }
-
-    handleSubmit = (e) => {
-        e.preventDefault()
-        this.props.sendMessage(this.state.message)
-        this.setState({
-          message: ''
-        })
-      }
-
-    handleChange = (e) => {
-        this.setState({
-          message: e.target.value
-        })
-      }
 
     render () {
         return(
@@ -163,15 +107,15 @@ class Inbox extends Component {
                                     <ul className="list-group list-group-flush message-list flex-container column">                 
                                         {this.state.inbox.map(message => {
                                         return (
-                                        <NavLink key={message.request_id}
-                                                to={`/chat?response_id=${message.messages[0].response_id}`} >
-                                                <li className="list-group-item" key={message.request_id}>
+                                        <NavLink key={message.id}
+                                                to={`/chat?response_id=${message.response_id}`} >
+                                                <li className="list-group-item" key={message.id}>
                                                     
                                                     <div className="name">
                                                     {message.request_description}
                                                     </div>
                                                     <div className="text">
-                                                    {message.messages[0].content}
+                                                    {message.content}
                                                     </div>
                                                 </li>
                                         </NavLink>

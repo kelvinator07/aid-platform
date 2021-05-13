@@ -3,9 +3,7 @@ import './Chat.css';
 import TextInput from '../../components/UI/TextInput/TextInput';
 import { getCurrentUser } from '../../containers/Util/auth';
 import { SERVER_API_URL } from '../../constants'
-// import actioncable from 'actioncable';
 import { createConsumer } from '@rails/actioncable';
-import Cable from 'actioncable';
 
 class Chat extends Component {
 
@@ -24,54 +22,44 @@ class Chat extends Component {
             name: "",
             currentUser: getCurrentUser()
         }
-        this.messageChannel = {}
-        // this.consumer = createConsumer('ws://localhost:5000/cable');
     }
 
-    componentWillMount() {
+    componentDidMount() {
         this.setState({ responseId: this.props.location.search.split("=")[1] });
-        // this.fetchMessages(this.props.location.search.split("=")[1]);
-
+        this.fetchMessages(this.props.location.search.split("=")[1]);
         this.createSocket();
     }
       
     createSocket() {
-        let cable = Cable.createConsumer('ws://localhost:5000/cable');
+        let cable = createConsumer('ws://localhost:5000/cable');
         this.chats = cable.subscriptions.create({
-            channel: 'message_channel'
-        //   channel: `response-${this.props.location.search.split("=")[1]}`
+            channel: 'MessagesChannel',
+            id: this.props.location.search.split("=")[1]
         }, {
           connected: () => {
             console.log("Connected")
           },
-          received: (data) => {
-            console.log(data);
+          disconnected: () => {
+            // Called when the subscription has been terminated by the server
+            console.log("disconnected")
           },
-          create: function(chatContent) {
-            this.perform('create', {
-              content: chatContent
-            });
+          received: (data) => {
+            // Called when there's incoming data on the websocket for this channel
+              console.log('received ', data)
+              let msg = {
+                    id: data.id,
+                    user: {
+                        firstname: data.firstname
+                    },
+                    content: data.content
+                }
+
+                let chatMessages = this.state.messages;
+                chatMessages.push(msg);
+                this.setState({ messages: chatMessages , message: ''});
           }
         });
       }
-
-    // componentDidMount() {
-        // this.setState({ responseId: this.props.location.search.split("=")[1] });
-        // this.fetchMessages(this.props.location.search.split("=")[1]);
-
-        // this.messageChannel = this.consumer.subscriptions.create(`response-${this.props.location.search.split("=")[1]}`, {
-        //     connected: () => {
-        //         console.log("Connected")
-        //     },
-        //     received: (data) => {
-        //       console.log(data)
-        //     },
-        //     disconnected: () => {
-        //         console.log("disconnected")
-        //     }
-        //   })
-       
-    // }
 
     fetchMessages = (responseId) => {
         const url = `${SERVER_API_URL}/api/v1/messages/${responseId}`;
@@ -84,7 +72,8 @@ class Chat extends Component {
             })
             .then(res => res.json())
             .then(
-                (result) => {  
+                (result) => { 
+                    console.log('messages > ', result) 
                     this.setState({
                         isLoading: false,
                         messages: result
@@ -140,18 +129,8 @@ class Chat extends Component {
             .then(res => res.json())
             .then(
                 (result) => {
-                    result = result.message
-                    let msg = {
-                        id: result.id,
-                        user: {
-                            firstname: result.firstname
-                        },
-                        content: result.content
-                    }
                     this.setState({
                         isLoading: false,
-                        message: '',
-                        messages: [ ...this.state.messages, msg ]
                     });
                 },
                 (error) => {
