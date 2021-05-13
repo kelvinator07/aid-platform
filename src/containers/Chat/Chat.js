@@ -2,7 +2,7 @@ import React, { Component } from "react";
 import './Chat.css';
 import TextInput from '../../components/UI/TextInput/TextInput';
 import { getCurrentUser } from '../../containers/Util/auth';
-import { SERVER_API_URL } from '../../constants'
+import { SERVER_API_URL, ACTION_CABLE_URL } from '../../constants'
 import { createConsumer } from '@rails/actioncable';
 
 class Chat extends Component {
@@ -31,7 +31,7 @@ class Chat extends Component {
     }
       
     createSocket() {
-        let cable = createConsumer('ws://localhost:5000/cable');
+        let cable = createConsumer(ACTION_CABLE_URL);
         this.chats = cable.subscriptions.create({
             channel: 'MessagesChannel',
             id: this.props.location.search.split("=")[1]
