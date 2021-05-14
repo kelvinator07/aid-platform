@@ -5,18 +5,11 @@ import App from './App';
 import reportWebVitals from './reportWebVitals';
 import { BrowserRouter } from 'react-router-dom';
 import 'bootstrap/dist/css/bootstrap.css';
-import { createConsumer } from '@rails/actioncable';
-import actionCable from 'actioncable';
 
-const CableApp = {}
-
-CableApp.cable = actionCable.createConsumer('ws://localhost:5000/cable')
-
-const Consumer = createConsumer('ws://localhost:5000/cable');
 
 ReactDOM.render(
   <BrowserRouter>
-    <App cableApp={CableApp} consumer={Consumer}/>
+    <App />
   </BrowserRouter>,
   document.getElementById('root')
 );
