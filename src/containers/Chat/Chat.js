@@ -45,7 +45,6 @@ class Chat extends Component {
           },
           received: (data) => {
             // Called when there's incoming data on the websocket for this channel
-              console.log('received ', data)
               let msg = {
                     id: data.id,
                     user: {
@@ -73,7 +72,6 @@ class Chat extends Component {
             .then(res => res.json())
             .then(
                 (result) => { 
-                    console.log('messages > ', result) 
                     this.setState({
                         isLoading: false,
                         messages: result
