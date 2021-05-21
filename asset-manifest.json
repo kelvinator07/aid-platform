@@ -1,0 +1,27 @@
+{
+  "files": {
+    "main.css": "/aid-platform/static/css/main.11d1a2cd.chunk.css",
+    "main.js": "/aid-platform/static/js/main.08bff511.chunk.js",
+    "main.js.map": "/aid-platform/static/js/main.08bff511.chunk.js.map",
+    "runtime-main.js": "/aid-platform/static/js/runtime-main.a7133658.js",
+    "runtime-main.js.map": "/aid-platform/static/js/runtime-main.a7133658.js.map",
+    "static/css/2.f98d7b13.chunk.css": "/aid-platform/static/css/2.f98d7b13.chunk.css",
+    "static/js/2.3efb7c43.chunk.js": "/aid-platform/static/js/2.3efb7c43.chunk.js",
+    "static/js/2.3efb7c43.chunk.js.map": "/aid-platform/static/js/2.3efb7c43.chunk.js.map",
+    "static/js/3.bdf8d6da.chunk.js": "/aid-platform/static/js/3.bdf8d6da.chunk.js",
+    "static/js/3.bdf8d6da.chunk.js.map": "/aid-platform/static/js/3.bdf8d6da.chunk.js.map",
+    "index.html": "/aid-platform/index.html",
+    "static/css/2.f98d7b13.chunk.css.map": "/aid-platform/static/css/2.f98d7b13.chunk.css.map",
+    "static/css/main.11d1a2cd.chunk.css.map": "/aid-platform/static/css/main.11d1a2cd.chunk.css.map",
+    "static/js/2.3efb7c43.chunk.js.LICENSE.txt": "/aid-platform/static/js/2.3efb7c43.chunk.js.LICENSE.txt",
+    "static/media/kelvin-logo.1abaff0d.png": "/aid-platform/static/media/kelvin-logo.1abaff0d.png",
+    "static/media/logo.103b5fa1.svg": "/aid-platform/static/media/logo.103b5fa1.svg"
+  },
+  "entrypoints": [
+    "static/js/runtime-main.a7133658.js",
+    "static/css/2.f98d7b13.chunk.css",
+    "static/js/2.3efb7c43.chunk.js",
+    "static/css/main.11d1a2cd.chunk.css",
+    "static/js/main.08bff511.chunk.js"
+  ]
+}
