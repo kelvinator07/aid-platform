@@ -3,7 +3,7 @@ import './Inbox.css';
 import { getCurrentUser } from '../../containers/Util/auth';
 import { NavLink } from "react-router-dom";
 import { SERVER_API_URL } from '../../constants'
-
+import moment from 'moment'
 
 class Inbox extends Component {
 
@@ -53,6 +53,7 @@ class Inbox extends Component {
                             container.request_id = obj.request_id;
                             container.response_id = obj.response_id;
                             container.request_description = req.description;
+                            container.created_at = new Date(obj.created_at);
 
                             return container;
                          })
@@ -70,14 +71,16 @@ class Inbox extends Component {
                             content: obj.messages[0].content,
                             request_id: obj.request_id,
                             response_id: obj.id,
-                            request_description: obj.request.description
+                            request_description: obj.request.description,
+                            created_at: new Date(obj.created_at)
                         }
                         inbox.push(fina)
                      })
-                     
+                    const sortedInbox = inbox.sort((a, b) => b.created_at - a.created_at)
+
                     this.setState({
                         isLoading: false,
-                        inbox: inbox
+                        inbox: sortedInbox
                     });
                 },
                 (error) => {
